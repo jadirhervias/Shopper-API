@@ -1,10 +1,11 @@
-package com.shopper.shopperapi.model;
+package com.shopper.shopperapi.models;
 
 import java.util.List;
 
 import lombok.Data;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
@@ -13,12 +14,8 @@ public class Category {
     @Id
     private ObjectId id;
     private String name;
+    @DBRef
     private List<Product> products;
-
-/*    public Category(ObjectId _id, String name) {
-        this._id = _id;
-        this.name = name;
-    }*/
 
     @Override
     public String toString() {

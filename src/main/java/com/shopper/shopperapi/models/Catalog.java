@@ -1,11 +1,14 @@
-package com.shopper.shopperapi.model;
+package com.shopper.shopperapi.models;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import javax.validation.constraints.NotNull;
 
@@ -16,9 +19,13 @@ import javax.validation.constraints.NotNull;
 public class Catalog {
     @Id
     private ObjectId id;
+    private String name;
     @NotNull
+    @Field("last_update")
+    @JsonProperty("last_update")
     private String lastUpdate;
-    private List<Product> products;
+    @DBRef
+    private List<Category> categories;
 
 /*
     @DBRef
@@ -28,15 +35,6 @@ public class Catalog {
         addresses = new ArrayList<UserAddress>();
     }
 */
-
-    // Another constructor to populate the entities when creating a new instance.
-    // public Catalog() {}
-
-/*    public Catalog(ObjectId id, String lastUpdate, List<Product> products) {
-        this.id = id;
-        this.lastUpdate = lastUpdate;
-        this.products = products;
-    }*/
 
     @Override
     public String toString() {

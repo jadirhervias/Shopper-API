@@ -1,10 +1,15 @@
-package com.shopper.shopperapi.model;
+package com.shopper.shopperapi.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.mongodb.lang.Nullable;
 import lombok.Data;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+
+import javax.validation.constraints.NotNull;
 
 @Data
 @Document(collection = "products")
@@ -15,20 +20,15 @@ public class Product {
     private String details;
     private double cost;
     private String format;
+    @Nullable
     @Indexed(unique = true)
+    @Field("bar_code")
+    @JsonProperty("bar_code")
     private String barCode;
-    // private Category categoryId;
-
-/*    public Product(ObjectId id, String name, String details, double cost, String format, String barCode) {
-//                   Category categoryId)
-        this.id = id;
-        this.name = name;
-        this.details = details;
-        this.cost = cost;
-        this.format = format;
-        this.barCode = barCode;
-        // this.categoryId = categoryId;
-    }*/
+    @NotNull
+    @Field("last_update")
+    @JsonProperty("last_update")
+    private String lastUpdate;
 
     @Override
     public String toString() {
