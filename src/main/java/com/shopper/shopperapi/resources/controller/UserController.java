@@ -2,10 +2,10 @@ package com.shopper.shopperapi.resources.controller;
 
 import com.shopper.shopperapi.models.User;
 import com.shopper.shopperapi.services.UserService;
-//import io.swagger.annotations.ApiOperation;
-//import io.swagger.annotations.ApiResponse;
-//import io.swagger.annotations.ApiResponses;
-//import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Api;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,7 +23,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/v1/users")
-// @Api(tags = "usuario")
+@Api(tags = "Usuarios")
 public class UserController {
     @Autowired
     private final UserService userService;
@@ -33,32 +33,32 @@ public class UserController {
     }
 
     @GetMapping
-//    @ApiOperation(value = "Listar usuarios", notes = "Servicio para listar usuarios")
-//    @ApiResponses(value = {
-//        @ApiResponse(code = 200, message = "Usuarios listadas correctamente"),
-//        @ApiResponse(code = 404, message = "Usuarios no encontrados")
-//    })
+    @ApiOperation(value = "Listar usuarios", notes = "Servicio para listar usuarios")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Usuarios listadas correctamente"),
+        @ApiResponse(code = 404, message = "Usuarios no encontrados")
+    })
     public ResponseEntity<List<User>> listUsers() {
         return ResponseEntity.ok(this.userService.findAll());
     }
 
     @GetMapping("/email")
-//    @ApiOperation(value = "Obtener usuario por email", notes = "Servicio para obtener usuario por su email")
-//    @ApiResponses(value = {
-//        @ApiResponse(code = 200, message = "Usuario encontrado"),
-//        @ApiResponse(code = 404, message = "Usuario no encontrado")
-//    })
+    @ApiOperation(value = "Obtener usuario por email", notes = "Servicio para obtener usuario por su email")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Usuario encontrado"),
+        @ApiResponse(code = 404, message = "Usuario no encontrado")
+    })
     public ResponseEntity<User> getUserByEmail(@Valid @Email @RequestParam(value = "email") String email) {
         User user = this.userService.findByEmail(email);
         return ResponseEntity.ok(user);
     }
 
     @PostMapping
-//    @ApiOperation(value = "Crear usuario", notes = "Servicio para crear usuarios")
-//    @ApiResponses(value = {
-//        @ApiResponse(code = 201, message = "Usuario creado correctamente"),
-//        @ApiResponse(code = 400, message = "Solicitud Inválida")
-//    })
+    @ApiOperation(value = "Crear usuario", notes = "Servicio para crear usuarios")
+    @ApiResponses(value = {
+        @ApiResponse(code = 201, message = "Usuario creado correctamente"),
+        @ApiResponse(code = 400, message = "Solicitud Inválida")
+    })
     public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
         user.setId(ObjectId.get());
         User newUser = this.userService.create(user);
@@ -66,11 +66,11 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-//    @ApiOperation(value = "Actualizar usuario", notes = "Servicio para actualizar usuarios")
-//    @ApiResponses(value = {
-//            @ApiResponse(code = 201, message = "Usuario actualizado correctamente"),
-//            @ApiResponse(code = 404, message = "Usuario no encontrado")
-//    })
+    @ApiOperation(value = "Actualizar usuario", notes = "Servicio para actualizar usuarios")
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Usuario actualizado correctamente"),
+            @ApiResponse(code = 404, message = "Usuario no encontrado")
+    })
     public ResponseEntity<User> updateUser(@PathVariable("id") ObjectId id, @Valid @RequestBody User user) {
         User newData = this.userService.findById(id);
         if (newData == null) {
@@ -81,11 +81,11 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-//    @ApiOperation(value = "Eliminar usuario", notes = "Servicio para eliminar usuarios")
-//    @ApiResponses(value = {
-//            @ApiResponse(code = 201, message = "Usuario eliminado correctamente"),
-//            @ApiResponse(code = 404, message = "Usuario no encontrado")
-//    })
+    @ApiOperation(value = "Eliminar usuario", notes = "Servicio para eliminar usuarios")
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Usuario eliminado correctamente"),
+            @ApiResponse(code = 404, message = "Usuario no encontrado")
+    })
     public void deleteUser(@PathVariable("id") ObjectId id) {
         User userToDelete = this.userService.findById(id);
         if (userToDelete != null) {

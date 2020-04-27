@@ -1,12 +1,10 @@
 package com.shopper.shopperapi.resources.controller;
 
 import com.shopper.shopperapi.models.Catalog;
-//import io.swagger.annotations.Api;
-//import io.swagger.annotations.ApiOperation;
-//import io.swagger.annotations.ApiResponse;
-//import io.swagger.annotations.ApiResponses;
-import com.shopper.shopperapi.models.Category;
-import com.shopper.shopperapi.models.Product;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import com.shopper.shopperapi.services.CatalogService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/catalogs")
-//@Api(tags = "catálogo")
+@Api(tags = "Catálogos")
 public class CatalogController {
     @Autowired
     // This annotation creates an instance of the PetsRepository object
@@ -31,21 +29,21 @@ public class CatalogController {
     }
 
     @GetMapping
-//    @ApiOperation(value = "Listar catálogos", notes = "Servicio para listar catálogos")
-//    @ApiResponses(value = {
-//        @ApiResponse(code = 200, message = "Catálogo listados correctamente"),
-//        @ApiResponse(code = 404, message = "Catálogos no encontrados")
-//    })
+    @ApiOperation(value = "Listar catálogos", notes = "Servicio para listar catálogos")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "Catálogo listados correctamente"),
+        @ApiResponse(code = 404, message = "Catálogos no encontrados")
+    })
     public ResponseEntity<List<Catalog>> listCatalogs() {
         return ResponseEntity.ok(catalogService.findAll());
     }
 
     @GetMapping("/{id}")
-//    @ApiOperation(value = "Obtener catálogo por ID", notes = "Servicio para obtener catálogo por ID")
-//    @ApiResponses(value = {
-//            @ApiResponse(code = 200, message = "Catálogo encontrado"),
-//            @ApiResponse(code = 404, message = "Catálogo no encontrado")
-//    })
+    @ApiOperation(value = "Obtener catálogo por ID", notes = "Servicio para obtener catálogo por ID")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Catálogo encontrado"),
+            @ApiResponse(code = 404, message = "Catálogo no encontrado")
+    })
     public ResponseEntity<Catalog> getCatalogById(@PathVariable("id") ObjectId id) {
         Catalog catalog = this.catalogService.findById(id);
         return ResponseEntity.ok(catalog);
@@ -62,11 +60,11 @@ public class CatalogController {
 //    }
 
     @PostMapping
-//    @ApiOperation(value = "Crear catálogo", notes = "Servicio para crear catálogos")
-//    @ApiResponses(value = {
-//        @ApiResponse(code = 201, message = "Catálogo creado correctamente"),
-//        @ApiResponse(code = 400, message = "Solicitud Inválida")
-//    })
+    @ApiOperation(value = "Crear catálogo", notes = "Servicio para crear catálogos")
+    @ApiResponses(value = {
+        @ApiResponse(code = 201, message = "Catálogo creado correctamente"),
+        @ApiResponse(code = 400, message = "Solicitud Inválida")
+    })
     public ResponseEntity<Catalog> createCatalog(@Valid @RequestBody Catalog catalog) {
         catalog.setId(ObjectId.get());
         Catalog newCatalog = this.catalogService.create(catalog);
@@ -74,11 +72,11 @@ public class CatalogController {
     }
 
     @PutMapping("/{id}")
-//    @ApiOperation(value = "Actualizar catálogo", notes = "Servicio para actualizar un catálogo")
-//    @ApiResponses(value = {
-//        @ApiResponse(code = 201, message = "Catálogo actualizado correctamente"),
-//        @ApiResponse(code = 404, message = "Catálogo no encontrado")
-//    })
+    @ApiOperation(value = "Actualizar catálogo", notes = "Servicio para actualizar un catálogo")
+    @ApiResponses(value = {
+        @ApiResponse(code = 201, message = "Catálogo actualizado correctamente"),
+        @ApiResponse(code = 404, message = "Catálogo no encontrado")
+    })
     public ResponseEntity<Catalog> updateCatalog(@PathVariable("id") ObjectId id, @Valid @RequestBody Catalog catalog) {
         Catalog newData = this.catalogService.findById(id);
         if (newData == null) {
@@ -89,11 +87,11 @@ public class CatalogController {
     }
 
     @DeleteMapping("/{id}")
-//    @ApiOperation(value = "Eliminar catálogo", notes = "Servicio para eliminar un catálogo")
-//    @ApiResponses(value = {
-//        @ApiResponse(code = 201, message = "Catálogo eliminado correctamente"),
-//        @ApiResponse(code = 404, message = "Catálogo no encontrado")
-//    })
+    @ApiOperation(value = "Eliminar catálogo", notes = "Servicio para eliminar un catálogo")
+    @ApiResponses(value = {
+        @ApiResponse(code = 201, message = "Catálogo eliminado correctamente"),
+        @ApiResponse(code = 404, message = "Catálogo no encontrado")
+    })
     public void deleteCatalog(@PathVariable("id") ObjectId id) {
         Catalog catalogToDelete = this.catalogService.findById(id);
         if (catalogToDelete != null) {
