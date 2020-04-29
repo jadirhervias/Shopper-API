@@ -18,6 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/categories")
 @Api(tags = "Categorías")
+@CrossOrigin(origins = "*")
 public class CategoryController {
     // This annotation creates an instance of the PetsRepository object
     // that will allow us to access and modify the category database.

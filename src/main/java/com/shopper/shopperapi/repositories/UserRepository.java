@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.CrossOrigin;
 
 @Repository
-@CrossOrigin(value = {})
 public interface UserRepository extends MongoRepository<User, String> {
     User findById(ObjectId id);
     @Query(value = "{email:?0}")

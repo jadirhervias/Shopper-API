@@ -23,6 +23,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/products")
 @Api(tags = "Productos")
+@CrossOrigin(origins = "*")
 public class ProductController {
     @Autowired
     private final ProductService productService;

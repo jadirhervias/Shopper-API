@@ -18,6 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/catalogs")
 @Api(tags = "Catálogos")
+@CrossOrigin(origins = "*")
 public class CatalogController {
     @Autowired
     // This annotation creates an instance of the PetsRepository object

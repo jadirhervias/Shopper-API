@@ -13,7 +13,6 @@ import java.util.List;
 
 // No need implementation, just one interface, and you have CRUD
 @Repository
-@CrossOrigin(value = {})
 public interface CatalogRepository extends MongoRepository<Catalog, String> {
     Catalog findById(ObjectId id);
 
