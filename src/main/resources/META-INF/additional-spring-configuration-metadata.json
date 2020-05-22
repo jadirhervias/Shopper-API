@@ -1,0 +1,14 @@
+{
+  "properties": [
+    {
+      "name": "shopper.http.api-key-token",
+      "type": "java.lang.String",
+      "description": "Api key token to allow access to specific third party front-end clients."
+    },
+    {
+      "name": "shopper.http.api-key-token-parameter",
+      "type": "java.lang.String",
+      "description": "API key token parameter for the request body."
+    }
+  ]
+}
