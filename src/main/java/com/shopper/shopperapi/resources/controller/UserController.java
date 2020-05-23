@@ -10,6 +10,7 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -33,7 +34,10 @@ public class UserController {
         this.userService = userService;
     }
 
+    // Para usar @PreAuthorize() annotation: hasRole('ROLE_'), hasAnyRole('ROLE_'), hasAuthority('permission'), hasAnyAuthority('permission')
+
     @GetMapping
+    @PreAuthorize("hasAuthority('users:read')")
     @ApiOperation(value = "Listar usuarios", notes = "Servicio para listar usuarios")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Usuarios listadas correctamente"),
@@ -44,6 +48,7 @@ public class UserController {
     }
 
     @GetMapping("/email")
+    @PreAuthorize("hasAuthority('users:read')")
     @ApiOperation(value = "Obtener usuario por email", notes = "Servicio para obtener usuario por su email")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = "Usuario encontrado"),
@@ -55,6 +60,7 @@ public class UserController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('users:write')")
     @ApiOperation(value = "Crear usuario", notes = "Servicio para crear usuarios")
     @ApiResponses(value = {
         @ApiResponse(code = 201, message = "Usuario creado correctamente"),
@@ -67,6 +73,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('users:write')")
     @ApiOperation(value = "Actualizar usuario", notes = "Servicio para actualizar usuarios")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Usuario actualizado correctamente"),
@@ -82,6 +89,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('users:write')")
     @ApiOperation(value = "Eliminar usuario", notes = "Servicio para eliminar usuarios")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Usuario eliminado correctamente"),
