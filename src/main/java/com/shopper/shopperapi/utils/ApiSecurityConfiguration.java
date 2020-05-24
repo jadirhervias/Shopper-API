@@ -13,6 +13,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+
+import java.util.concurrent.TimeUnit;
+
 import static com.shopper.shopperapi.utils.security.ApplicationUserRole.*;
 
 @Configuration
@@ -120,22 +124,35 @@ public class ApiSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-            .csrf()
-                .disable()
-            .formLogin()
-                .disable()
+            .csrf().disable()
+//            .formLogin().disable()
             .authorizeRequests()
-            .antMatchers("/", "index", "/css/*", "/js/*").permitAll()
-            .antMatchers("api/v1/users/*").hasRole(ADMIN.name())
-            .antMatchers("/api/v1/auth/login", "/api/v1/auth/register")
+            .antMatchers("/", "index", "/css/*", "/js/*", "/api/v1/auth/login", "/api/v1/auth/register")
                 .permitAll()
-//            .antMatchers("/api/v1/users").hasRole(ApplicationUserRole.ADMIN.name())
-//            .antMatchers(HttpMethod.GET, "/api/v1/users").hasAuthority(ApplicationUserPermission.USERS_READ.getPermission())
-//            .antMatchers(HttpMethod.GET, "/api/v1/products").hasAuthority(ApplicationUserPermission.PRODUCTS_READ.getPermission())
+            .antMatchers("api/v1/users/*").hasRole(ADMIN.name())
             .anyRequest()
                 .authenticated()
             .and()
-            .httpBasic();
+//            .httpBasic();
+            .formLogin()
+                .loginPage("/login")
+                .permitAll()
+                .defaultSuccessUrl("/admin", true)
+                .passwordParameter("password")
+                .usernameParameter("username")
+            .and()
+            .rememberMe()
+                .tokenValiditySeconds((int) TimeUnit.DAYS.toSeconds(21))
+                .key("somethingverysecured")
+                .rememberMeParameter("remember-me")
+            .and()
+            .logout()
+                .logoutUrl("/logout")
+                .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "GET")) // https://docs.spring.io/spring-security/site/docs/4.2.12.RELEASE/apidocs/org/springframework/security/config/annotation/web/configurers/LogoutConfigurer.html
+                .clearAuthentication(true)
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID", "remember-me")
+                .logoutSuccessUrl("/login");
     }
 
     @Override
