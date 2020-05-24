@@ -1,48 +1,30 @@
 package com.shopper.shopperapi.utils;
 
-import com.shopper.shopperapi.utils.security.ApplicationUserPermission;
 import com.shopper.shopperapi.utils.security.ApplicationUserRole;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import static com.shopper.shopperapi.utils.security.ApplicationUserRole.*;
 
-import java.util.concurrent.TimeUnit;
-
+@Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class ApiSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-//    @Autowired
-//    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-//        auth
-//            .inMemoryAuthentication()
-//            .withUser("user").password(bcryptPasswordEncoder().encode("user")).roles("USER").and()
-//            .withUser("admin").password(bcryptPasswordEncoder().encode("admin")).roles("USER", "ADMIN");
-//    }
+    private final PasswordEncoder passwordEncoder;
 
-    @Bean
-    public BCryptPasswordEncoder bcryptPasswordEncoder() {
-        return new BCryptPasswordEncoder(10);
+    @Autowired
+    public ApiSecurityConfiguration(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
     }
 
 //    @Bean
@@ -143,6 +125,8 @@ public class ApiSecurityConfiguration extends WebSecurityConfigurerAdapter {
             .formLogin()
                 .disable()
             .authorizeRequests()
+            .antMatchers("/", "index", "/css/*", "/js/*").permitAll()
+            .antMatchers("api/v1/users/*").hasRole(ADMIN.name())
             .antMatchers("/api/v1/auth/login", "/api/v1/auth/register")
                 .permitAll()
 //            .antMatchers("/api/v1/users").hasRole(ApplicationUserRole.ADMIN.name())
@@ -152,17 +136,6 @@ public class ApiSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .authenticated()
             .and()
             .httpBasic();
-//            .and()
-//            .rememberMe()
-//                .tokenValiditySeconds((int) TimeUnit.DAYS.toSeconds(21))
-//                .key("algoseguro");
-//            .and()
-//            .logout()
-//                .logoutUrl("/")
-//                .clearAuthentication(true)
-//                .invalidateHttpSession(true)
-//                .deleteCookies("JSESSIONID", "remember-me")
-//                .logoutSuccessUrl("/");
     }
 
     @Override
@@ -170,22 +143,19 @@ public class ApiSecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected UserDetailsService userDetailsService() {
         UserDetails admin = User.builder()
                 .username("admin")
-                .password(bcryptPasswordEncoder().encode("admin"))
-//                .roles(ApplicationUserRole.ADMIN.name()) // ROLE_ADMIN
+                .password(passwordEncoder.encode("admin"))
                 .authorities(ApplicationUserRole.ADMIN.getGrantedAuthorities())
                 .build();
 
         UserDetails shopper = User.builder()
                 .username("shopper")
-                .password(bcryptPasswordEncoder().encode("shopper"))
-//                .roles(ApplicationUserRole.ADMIN.name()) // ROLE_SHOPPER
+                .password(passwordEncoder.encode("shopper"))
                 .authorities(ApplicationUserRole.SHOPPER.getGrantedAuthorities())
                 .build();
 
         UserDetails customer = User.builder()
                 .username("customer")
-                .password(bcryptPasswordEncoder().encode("customer"))
-//                .roles(ApplicationUserRole.CUSTOMER.name()) // ROLE_CUSTOMER
+                .password(passwordEncoder.encode("customer"))
                 .authorities(ApplicationUserRole.CUSTOMER.getGrantedAuthorities())
                 .build();
 
