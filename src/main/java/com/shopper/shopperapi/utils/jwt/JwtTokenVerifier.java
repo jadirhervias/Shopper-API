@@ -51,6 +51,8 @@ public class JwtTokenVerifier extends OncePerRequestFilter {
         // Quitar el Bearer
         String token = authorizationHeader.replace(jwtConfig.getTokenPrefix(), "");
 
+        System.out.println(">>>>>>>>>>>> token a parsear: " + token);
+
         try {
 
             // Validar el JWT
@@ -81,7 +83,9 @@ public class JwtTokenVerifier extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
         } catch (JwtException e) {
-            throw new IllegalStateException(String.format("Token %s inválido", token));
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
+                    "Api key token is invalid or incorrect");
+//            throw new IllegalStateException(String.format("Token %s inválido", token));
         }
 
         // para pasar el request y response al siguiente filter (como next() en Express)

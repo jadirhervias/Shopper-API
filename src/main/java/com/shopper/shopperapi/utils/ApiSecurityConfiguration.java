@@ -1,11 +1,9 @@
 package com.shopper.shopperapi.utils;
 
 import com.shopper.shopperapi.auth.ApplicationUserService;
-import com.shopper.shopperapi.utils.jwt.JwtConfig;
-import com.shopper.shopperapi.utils.jwt.JwtTokenVerifier;
-import com.shopper.shopperapi.utils.jwt.JwtUsernameAndPasswordAuthenticationFilter;
+import com.shopper.shopperapi.utils.apiKeyToken.ApiKeyTokenVerifier;
+import com.shopper.shopperapi.utils.jwt.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -16,10 +14,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import javax.crypto.SecretKey;
-import java.util.concurrent.TimeUnit;
 
 import static com.shopper.shopperapi.utils.security.ApplicationUserRole.*;
 
@@ -32,16 +29,19 @@ public class ApiSecurityConfiguration extends WebSecurityConfigurerAdapter {
     private final ApplicationUserService applicationUserService;
     private final SecretKey secretKey;
     private final JwtConfig jwtConfig;
+    private final ApiKeyTokenVerifier apiKeyTokenVerifier;
 
     @Autowired
     public ApiSecurityConfiguration(PasswordEncoder passwordEncoder,
                                     ApplicationUserService applicationUserService,
                                     SecretKey secretKey,
-                                    JwtConfig jwtConfig) {
+                                    JwtConfig jwtConfig,
+                                    ApiKeyTokenVerifier apiKeyTokenVerifier) {
         this.passwordEncoder = passwordEncoder;
         this.applicationUserService = applicationUserService;
         this.secretKey = secretKey;
         this.jwtConfig = jwtConfig;
+        this.apiKeyTokenVerifier = apiKeyTokenVerifier;
     }
 
 //    @Configuration
@@ -108,16 +108,20 @@ public class ApiSecurityConfiguration extends WebSecurityConfigurerAdapter {
 //            .formLogin().disable()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
-//            .addFilterBefore(Autenticar el API KEY token)
-            .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager(), jwtConfig, secretKey))
-            .addFilterAfter(new JwtTokenVerifier(secretKey, jwtConfig), JwtUsernameAndPasswordAuthenticationFilter.class)
             .authorizeRequests()
             .antMatchers("/", "index", "/css/*", "/js/*", "/api/v1/auth/login", "/api/v1/auth/register")
                 .permitAll()
             .antMatchers("api/v1/users/*").hasRole(ADMIN.name())
             .anyRequest()
-                .authenticated();
-//            .httpBasic();
+                .authenticated()
+            .and()
+            .httpBasic()
+//                .authenticationEntryPoint()
+            .and()
+//            .addFilterBefore(new ApiKeyTokenFilter(apiKeyTokenVerifier), BasicAuthenticationFilter.class)
+//            .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager(), jwtConfig, secretKey))
+            .addFilterAfter(new JwtUsernameAndPasswordAuthenticationFilter(apiKeyTokenVerifier, jwtConfig, secretKey), BasicAuthenticationFilter.class)
+            .addFilterAfter(new JwtTokenVerifier(secretKey, jwtConfig), JwtUsernameAndPasswordAuthenticationFilter.class);
     }
 
     @Override
