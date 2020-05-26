@@ -1,20 +1,24 @@
 package com.shopper.shopperapi.utils;
 
-import com.shopper.shopperapi.utils.security.ApplicationUserRole;
+import com.shopper.shopperapi.auth.ApplicationUserService;
+import com.shopper.shopperapi.utils.jwt.JwtConfig;
+import com.shopper.shopperapi.utils.jwt.JwtTokenVerifier;
+import com.shopper.shopperapi.utils.jwt.JwtUsernameAndPasswordAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+import javax.crypto.SecretKey;
 import java.util.concurrent.TimeUnit;
 
 import static com.shopper.shopperapi.utils.security.ApplicationUserRole.*;
@@ -25,16 +29,20 @@ import static com.shopper.shopperapi.utils.security.ApplicationUserRole.*;
 public class ApiSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private final PasswordEncoder passwordEncoder;
+    private final ApplicationUserService applicationUserService;
+    private final SecretKey secretKey;
+    private final JwtConfig jwtConfig;
 
     @Autowired
-    public ApiSecurityConfiguration(PasswordEncoder passwordEncoder) {
+    public ApiSecurityConfiguration(PasswordEncoder passwordEncoder,
+                                    ApplicationUserService applicationUserService,
+                                    SecretKey secretKey,
+                                    JwtConfig jwtConfig) {
         this.passwordEncoder = passwordEncoder;
+        this.applicationUserService = applicationUserService;
+        this.secretKey = secretKey;
+        this.jwtConfig = jwtConfig;
     }
-
-//    @Bean
-//    public PasswordEncoder passwordEncoder() {
-//        return NoOpPasswordEncoder.getInstance();
-//    }
 
 //    @Configuration
 //    @Order(1)
@@ -92,90 +100,36 @@ public class ApiSecurityConfiguration extends WebSecurityConfigurerAdapter {
 //        }
 //    }
 
-    // Basic Authentication
-//    @Override
-//    public void configure(AuthenticationManagerBuilder auth) throws Exception {
-//        // Se define la clase que recupera los usuarios y el algoritmo para procesar las passwords
-//        auth.userDetailsService(customUserDetailsService).passwordEncoder(bcryptPasswordEncoder());
-//
-//    }
-
-    // Authorization
-    // No @Order(): último por defecto
-//    @Order(2)
-//    @Configuration
-//    public static class BasicAuthSecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
-//        @Override
-//        protected void configure(HttpSecurity http) throws Exception {
-//            http
-//                .authorizeRequests()
-////                .antMatchers("/api/v1/**")
-////                    .hasRole("ADMIN")
-//                .anyRequest()
-//                    .authenticated()
-//                .and()
-//                .csrf()
-//                    .disable()
-//                .httpBasic();
-//        }
-//    }
-
     // Authorization
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
             .csrf().disable()
 //            .formLogin().disable()
+            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and()
+//            .addFilterBefore(Autenticar el API KEY token)
+            .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager(), jwtConfig, secretKey))
+            .addFilterAfter(new JwtTokenVerifier(secretKey, jwtConfig), JwtUsernameAndPasswordAuthenticationFilter.class)
             .authorizeRequests()
             .antMatchers("/", "index", "/css/*", "/js/*", "/api/v1/auth/login", "/api/v1/auth/register")
                 .permitAll()
             .antMatchers("api/v1/users/*").hasRole(ADMIN.name())
             .anyRequest()
-                .authenticated()
-            .and()
+                .authenticated();
 //            .httpBasic();
-            .formLogin()
-                .loginPage("/login")
-                .permitAll()
-                .defaultSuccessUrl("/admin", true)
-                .passwordParameter("password")
-                .usernameParameter("username")
-            .and()
-            .rememberMe()
-                .tokenValiditySeconds((int) TimeUnit.DAYS.toSeconds(21))
-                .key("somethingverysecured")
-                .rememberMeParameter("remember-me")
-            .and()
-            .logout()
-                .logoutUrl("/logout")
-                .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "GET")) // https://docs.spring.io/spring-security/site/docs/4.2.12.RELEASE/apidocs/org/springframework/security/config/annotation/web/configurers/LogoutConfigurer.html
-                .clearAuthentication(true)
-                .invalidateHttpSession(true)
-                .deleteCookies("JSESSIONID", "remember-me")
-                .logoutSuccessUrl("/login");
     }
 
     @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.authenticationProvider(daoAuthenticationProvider());
+    }
+
     @Bean
-    protected UserDetailsService userDetailsService() {
-        UserDetails admin = User.builder()
-                .username("admin")
-                .password(passwordEncoder.encode("admin"))
-                .authorities(ApplicationUserRole.ADMIN.getGrantedAuthorities())
-                .build();
-
-        UserDetails shopper = User.builder()
-                .username("shopper")
-                .password(passwordEncoder.encode("shopper"))
-                .authorities(ApplicationUserRole.SHOPPER.getGrantedAuthorities())
-                .build();
-
-        UserDetails customer = User.builder()
-                .username("customer")
-                .password(passwordEncoder.encode("customer"))
-                .authorities(ApplicationUserRole.CUSTOMER.getGrantedAuthorities())
-                .build();
-
-        return new InMemoryUserDetailsManager(admin, shopper, customer);
+    public DaoAuthenticationProvider daoAuthenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setPasswordEncoder(passwordEncoder);
+        provider.setUserDetailsService(applicationUserService);
+        return provider;
     }
 }

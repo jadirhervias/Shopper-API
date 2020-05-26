@@ -1,5 +1,6 @@
 package com.shopper.shopperapi;
 
+import com.shopper.shopperapi.utils.jwt.JwtConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
@@ -9,6 +10,7 @@ import org.springframework.web.client.RestTemplate;
 
 //@EnableAutoConfiguration
 @SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
+@EnableConfigurationProperties(JwtConfig.class)
 public class ShopperApiApplication {
 
 	// @Bean para que solo se cree una instancia de cierta clase a lo largo de la aplicación. Evita la sobrecarga de instancias
