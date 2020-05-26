@@ -2,6 +2,7 @@ package com.shopper.shopperapi.utils.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
+import net.minidev.json.JSONObject;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -14,6 +15,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.Date;
 
@@ -22,6 +24,7 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
     private final AuthenticationManager authenticationManager;
     private final JwtConfig jwtConfig;
     private final SecretKey secretKey;
+    private JSONObject userJson = new JSONObject();
 
     public JwtUsernameAndPasswordAuthenticationFilter(
             AuthenticationManager authenticationManager,
@@ -36,7 +39,8 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
     // Para autenticar al usuario (Tiene que ser Basic Auth)
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request,
-                                                HttpServletResponse response) throws AuthenticationException {
+                                                HttpServletResponse response)
+            throws AuthenticationException {
 
         try {
             UsernameAndPasswordAuthenticationRequest authenticationRequest = new ObjectMapper()
@@ -48,6 +52,9 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
             );
 
             Authentication authenticate = authenticationManager.authenticate(authentication);
+
+            this.userJson.put("email", authenticationRequest.getUsername());
+
             return authenticate;
 
         } catch (IOException e) {
@@ -72,6 +79,21 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends UsernamePassword
                 .signWith(secretKey)
                 .compact();
 
-        response.addHeader(jwtConfig.getAuthorizationHeader(), jwtConfig.getTokenPrefix() + token);
+        JSONObject json = new JSONObject();
+
+        if (userJson != null) {
+            json.put("token", token);
+            json.put("user", userJson);
+        } else {
+            json.put("user", null);
+        }
+
+//        response.addHeader(jwtConfig.getAuthorizationHeader(), jwtConfig.getTokenPrefix() + token);
+
+        PrintWriter out = response.getWriter();
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        out.print(json.toString());
+        out.flush();
     }
 }
