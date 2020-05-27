@@ -42,7 +42,7 @@ public class User {
 //    @Value("${role: ROLE_USER}")
     @Field("role")
     @JsonProperty("role")
-    private String role = "ROLE_USER"; // Default
+    private String role = "ROLE_CUSTOMER"; // Default
     
     @NotNull(message = "La contraseña es requerida")
     @Field("password")

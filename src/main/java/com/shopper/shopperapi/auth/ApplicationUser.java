@@ -22,28 +22,6 @@ public class ApplicationUser implements UserDetails {
 //    private final boolean active;
     private final Set<? extends GrantedAuthority> grantedAuthorities;
 
-//    private final boolean isAccountNonExpired;
-//    private final boolean isAccountNonLocked;
-//    private final boolean isCredentialsNonExpired;
-//    private final boolean isEnabled;
-
-//    public ApplicationUser(String username,
-//                           String password,
-//                           Set<? extends GrantedAuthority> grantedAuthorities,
-//                           boolean isAccountNonExpired,
-//                           boolean isAccountNonLocked,
-//                           boolean isCredentialsNonExpired,
-//                           boolean isEnabled
-//    ) {
-//        this.username = username;
-//        this.password = password;
-//        this.grantedAuthorities = grantedAuthorities;
-//        this.isAccountNonExpired = isAccountNonExpired;
-//        this.isAccountNonLocked = isAccountNonLocked;
-//        this.isCredentialsNonExpired = isCredentialsNonExpired;
-//        this.isEnabled = isEnabled;
-//    }
-
     public ApplicationUser(User user) {
         this.username = user.getEmail();
         this.password = user.getPassword();
@@ -57,7 +35,7 @@ public class ApplicationUser implements UserDetails {
                     user.getRole().equals("ROLE_SHOPPER") ?
                     SHOPPER.getGrantedAuthorities() : (
                         user.getRole().equals("ROLE_CUSTOMER") ?
-                            CUSTOMER.getGrantedAuthorities() : null
+                            CUSTOMER.getGrantedAuthorities() : CUSTOMER.getGrantedAuthorities()
                     )
                 );
     }

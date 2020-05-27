@@ -44,68 +44,12 @@ public class ApiSecurityConfiguration extends WebSecurityConfigurerAdapter {
         this.apiKeyTokenVerifier = apiKeyTokenVerifier;
     }
 
-//    @Configuration
-//    @Order(1)
-//    public static class ApiKeyTokenSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
-//        @Value("${shopper.http.api-key-token}")
-//        private String apiKeyTokenValue;
-//
-//        @Value("${shopper.http.api-key-token-parameter}")
-//        private String apiKeyTokenRequestParameter;
-//
-//        @Override
-//        protected void configure(HttpSecurity httpSecurity) throws Exception {
-//            ApiKeyTokenAuthFilter filter = new ApiKeyTokenAuthFilter(apiKeyTokenRequestParameter);
-//            filter.setAuthenticationManager(new AuthenticationManager() {
-//                @Override
-//                public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-//                    // Obtener info del usuario logeado
-//                    String principal = (String) authentication.getPrincipal();
-//                    final Log logger = LogFactory.getLog(this.getClass());
-//
-//                    if (!apiKeyTokenValue.equals(principal)) {
-//                        logger.info("Api token no es igual al del entorno - filter response");
-//                        throw new BadCredentialsException("El API key token no fue encontrado o es inválido");
-//                    }
-//
-//                    logger.info("Api token OK (" + apiKeyTokenValue + ") - filter response");
-//                    authentication.setAuthenticated(true);
-//                    return authentication;
-//                }
-//            });
-//            httpSecurity.
-//                    antMatcher("/api/v1/**")
-//                    .csrf()
-//                        .disable()
-//                    .sessionManagement()
-//                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//                    .and()
-//                    .addFilter(filter)
-//                    .authorizeRequests()
-//                        .anyRequest()
-//                        .authenticated();
-//        }
-//    }
-
-//    @Configuration
-//    @Order(2)
-//    public static class ApiWebSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
-//        protected void configure(HttpSecurity http) throws Exception {
-//            http
-//                .antMatcher("/api/**")
-//                .authorizeRequests()
-//                .anyRequest().hasRole("ADMIN")
-//                .and()
-//                .httpBasic();
-//        }
-//    }
-
     // Authorization
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
             .csrf().disable()
-//            .formLogin().disable()
+            .formLogin().disable()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
             .authorizeRequests()
@@ -118,12 +62,11 @@ public class ApiSecurityConfiguration extends WebSecurityConfigurerAdapter {
             .httpBasic()
 //                .authenticationEntryPoint()
             .and()
-//            .addFilterBefore(new ApiKeyTokenFilter(apiKeyTokenVerifier), BasicAuthenticationFilter.class)
-//            .addFilter(new JwtUsernameAndPasswordAuthenticationFilter(authenticationManager(), jwtConfig, secretKey))
             .addFilterAfter(new JwtUsernameAndPasswordAuthenticationFilter(apiKeyTokenVerifier, jwtConfig, secretKey), BasicAuthenticationFilter.class)
             .addFilterAfter(new JwtTokenVerifier(secretKey, jwtConfig), JwtUsernameAndPasswordAuthenticationFilter.class);
     }
 
+    // Authentication
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.authenticationProvider(daoAuthenticationProvider());
