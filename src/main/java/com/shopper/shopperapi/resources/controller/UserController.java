@@ -13,9 +13,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.swing.text.html.Option;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Clase que representa el servicio web de usuarios
@@ -55,8 +57,8 @@ public class UserController {
         @ApiResponse(code = 404, message = "Usuario no encontrado")
     })
     public ResponseEntity<User> getUserByEmail(@Valid @Email @RequestParam(value = "email") String email) {
-        User user = this.userService.findByEmail(email);
-        return ResponseEntity.ok(user);
+        Optional<User> user = this.userService.findByEmail(email);
+        return ResponseEntity.ok(user.get());
     }
 
     @PostMapping
@@ -80,11 +82,25 @@ public class UserController {
             @ApiResponse(code = 404, message = "Usuario no encontrado")
     })
     public ResponseEntity<User> updateUser(@PathVariable("id") ObjectId id, @Valid @RequestBody User user) {
-        User newData = this.userService.findById(id);
-        if (newData == null) {
+        Optional<User> userToUpdate = this.userService.findById(id);
+
+        if (!userToUpdate.isPresent()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        this.userService.update(id, newData);
+
+//        userToUpdate.isPresent( () -> {
+//            this.userService.update(id, user);
+//            return new ResponseEntity<>(HttpStatus.OK);
+//        });
+
+//        newData.orElseGet((userToUpdate) -> {
+//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//        });
+
+//        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+//        this.userService.update(id, newData.get());
+        this.userService.update(id, user);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -96,9 +112,15 @@ public class UserController {
             @ApiResponse(code = 404, message = "Usuario no encontrado")
     })
     public void deleteUser(@PathVariable("id") ObjectId id) {
-        User userToDelete = this.userService.findById(id);
-        if (userToDelete != null) {
-            this.userService.delete(userToDelete);
-        }
+        Optional<User> userToDelete = this.userService.findById(id);
+//        if (userToDelete != null) {
+//            this.userService.delete(userToDelete);
+//        }
+
+        //        this.userService.delete(userToDelete.get());
+
+        userToDelete.ifPresent(user -> {
+            this.userService.delete(userToDelete.get());
+        });
     }
 }

@@ -3,13 +3,12 @@ package com.shopper.shopperapi.models;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.bson.types.ObjectId;
-import org.springframework.boot.context.properties.bind.DefaultValue;
+//import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.*;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import javax.validation.constraints.Email;
@@ -40,7 +39,10 @@ public class User {
     private String email;
     
     // TODO : Default role is USER
-    private String role;
+//    @Value("${role: ROLE_USER}")
+    @Field("role")
+    @JsonProperty("role")
+    private String role = "ROLE_USER"; // Default
     
     @NotNull(message = "La contraseña es requerida")
     @Field("password")

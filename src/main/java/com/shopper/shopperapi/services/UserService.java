@@ -4,19 +4,24 @@ import com.shopper.shopperapi.models.User;
 import com.shopper.shopperapi.repositories.UserRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
 public class UserService {
-    @Autowired
-    private final UserRepository userRepository;
 
-    public UserService(UserRepository userRepository) {
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    @Autowired
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     /**
@@ -32,7 +37,7 @@ public class UserService {
      * @param id
      * @return User
      */
-    public User findById(ObjectId id) {
+    public Optional<User> findById(ObjectId id) {
         return this.userRepository.findById(id);
     }
 
@@ -41,8 +46,8 @@ public class UserService {
      * @param email
      * @return User
      */
-    public User findByEmail(String email) {
-        User user = this.userRepository.findByEmail(email);
+    public Optional<User> findByEmail(String email) {
+        Optional<User> user = this.userRepository.findByEmail(email);
         return user;
     }
 
@@ -54,6 +59,7 @@ public class UserService {
     @Transactional
     public User create(User user) {
         user.setId(ObjectId.get());
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return this.userRepository.save(user);
     }
 
