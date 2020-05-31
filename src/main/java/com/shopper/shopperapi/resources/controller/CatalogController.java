@@ -67,7 +67,8 @@ public class CatalogController {
         @ApiResponse(code = 400, message = "Solicitud Inválida")
     })
     public ResponseEntity<Catalog> createCatalog(@Valid @RequestBody Catalog catalog) {
-        catalog.setId(ObjectId.get());
+//        catalog.setId(ObjectId.get());
+        catalog.setId(ObjectId.get().toHexString());
         Catalog newCatalog = this.catalogService.create(catalog);
         return new ResponseEntity<>(newCatalog, HttpStatus.CREATED);
     }

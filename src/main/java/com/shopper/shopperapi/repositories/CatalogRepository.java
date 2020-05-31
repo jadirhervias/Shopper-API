@@ -15,6 +15,7 @@ import java.util.List;
 @Repository
 public interface CatalogRepository extends MongoRepository<Catalog, String> {
     Catalog findById(ObjectId id);
+//    Catalog findById(String id);
 
 //    @Query(fields = "{_id:0,name:0,last_update:0}")
 //    List<Catalog> getCategories(ObjectId id);

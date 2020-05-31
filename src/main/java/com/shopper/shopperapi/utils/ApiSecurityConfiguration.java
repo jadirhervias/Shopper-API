@@ -53,7 +53,7 @@ public class ApiSecurityConfiguration extends WebSecurityConfigurerAdapter {
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
             .authorizeRequests()
-            .antMatchers("/", "index", "/css/*", "/js/*", "/api/v1/auth/login", "/api/v1/auth/register")
+            .antMatchers("/", "/api/v1/auth/login", "/api/v1/auth/register")
                 .permitAll()
             .antMatchers("api/v1/users/*").hasRole(ADMIN.name())
             .anyRequest()

@@ -6,9 +6,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.*;
+import org.springframework.data.mongodb.repository.Query;
 
 import javax.validation.constraints.NotNull;
 
@@ -18,14 +17,16 @@ import javax.validation.constraints.NotNull;
 @Document(collection = "catalogs")
 public class Catalog {
     @Id
-    private ObjectId id;
+//    @MongoId(FieldType.OBJECT_ID)
+//    private ObjectId id;
+    private String id = ObjectId.get().toHexString();
     private String name;
     @NotNull
     @Field("last_update")
     @JsonProperty("last_update")
     private String lastUpdate;
     @DBRef
-    private List<Category> categories;
+    private List<Category> categories = null;
 
 /*
     @DBRef
@@ -44,7 +45,7 @@ public class Catalog {
         );
     }
 
-    public String getId() {
-        return id.toHexString();
-    }
+//    public String getId() {
+//        return id.toHexString();
+//    }
 }

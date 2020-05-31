@@ -15,7 +15,7 @@ import javax.validation.constraints.NotNull;
 @Document(collection = "products")
 public class Product {
     @Id
-    private ObjectId id;
+    private ObjectId id = ObjectId.get();
     private String name;
     private String details;
     private double cost;

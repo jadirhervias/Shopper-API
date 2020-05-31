@@ -34,6 +34,9 @@ public class CatalogService {
      * @param id
      * @return Catalog
      */
+//    public Catalog findById(String id) {
+//        return this.catalogRepository.findById(id);
+//    }
     public Catalog findById(ObjectId id) {
         return this.catalogRepository.findById(id);
     }
@@ -63,7 +66,8 @@ public class CatalogService {
      */
     @Transactional
     public Catalog create(Catalog catalog) {
-        catalog.setId(ObjectId.get());
+//        catalog.setId(ObjectId.get());
+        catalog.setId(ObjectId.get().toHexString());
         return this.catalogRepository.save(catalog);
     }
 
@@ -74,7 +78,8 @@ public class CatalogService {
      */
     @Transactional
     public void update(ObjectId id, Catalog catalog) {
-        catalog.setId(id);
+//        catalog.setId(id);
+        catalog.setId(id.toHexString());
         this.catalogRepository.save(catalog);
     }
 
