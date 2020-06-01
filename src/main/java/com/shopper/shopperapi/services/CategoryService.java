@@ -1,23 +1,30 @@
 package com.shopper.shopperapi.services;
 
 import com.shopper.shopperapi.models.Category;
+import com.shopper.shopperapi.models.Product;
 import com.shopper.shopperapi.repositories.CategoryRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
 public class CategoryService {
-    @Autowired
-    private final CategoryRepository categoryRepository;
 
-    public CategoryService(CategoryRepository categoryRepository) {
-        this.categoryRepository = categoryRepository;
-    }
+    @Autowired
+    private CategoryRepository categoryRepository;
+
+//    public CategoryService(CategoryRepository categoryRepository) {
+//        this.categoryRepository = categoryRepository;
+//    }
 
     /**
      * Método para listar categorías de productos
@@ -34,6 +41,27 @@ public class CategoryService {
      */
     public Category findById(ObjectId id) {
         return this.categoryRepository.findById(id);
+    }
+
+    /**
+     * Método para retornar una lista de categorías paginadas
+     */
+    public Page<Category> findCategoryPagesById(ObjectId id, Pageable pageable) {
+        return categoryRepository.findCategoryPagesById(id, pageable);
+    }
+
+    /**
+     * Obtener una lista de productos por categoría para paginar
+     * @param id
+     * @return List<?>
+     */
+    public List<Product> findProductsByCategoryId(ObjectId id) {
+        List<Product> products = findById(id).getProducts();
+        return products;
+    }
+    public List<Product> findProductsById(ObjectId id) {
+        List<Product> products = findById(id).getProducts();
+        return products;
     }
 
     /**

@@ -8,27 +8,29 @@ import io.swagger.annotations.Api;
 import com.shopper.shopperapi.services.CategoryService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/v1/categories")
+@RequestMapping(value = "categories", produces = "application/hal+json")
 @Api(tags = "Categorías")
 @CrossOrigin(origins = "*")
 public class CategoryController {
-    // This annotation creates an instance of the PetsRepository object
-    // that will allow us to access and modify the category database.
+
     @Autowired
+    private CategoryService categoryService ;
 
-    private final CategoryService categoryService ;
-
-    public CategoryController(CategoryService categoryService) {
-        this.categoryService = categoryService;
-    }
+//    public CategoryController(CategoryService categoryService) {
+//        this.categoryService = categoryService;
+//    }
 
     @GetMapping
     @ApiOperation(value = "Listar categorías", notes = "Servicio para listar categorias")
@@ -38,6 +40,25 @@ public class CategoryController {
     })
     public ResponseEntity<List<Category>> listCategories() {
         return ResponseEntity.ok(this.categoryService.findAll());
+    }
+
+    // Custom pagination for categories
+    @GetMapping("{idCategory}/pagination")
+    public ResponseEntity<Page<Category>> getProductsByCategoryId(@PathVariable("idCategory") ObjectId idCategory,
+                                                                  @RequestParam Optional<Integer> page,
+                                                                  @RequestParam Optional<String> sortBy) {
+
+        Page<Category> categories = this.categoryService.findCategoryPagesById(
+                idCategory,
+                PageRequest.of(
+                        page.orElse(0),
+                        25,
+                        Sort.Direction.ASC,
+                        sortBy.orElse("id")
+                )
+        );
+
+        return ResponseEntity.ok(categories);
     }
 
     @GetMapping("/{id}")

@@ -6,6 +6,7 @@ import com.shopper.shopperapi.utils.jwt.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -47,15 +48,16 @@ public class ApiSecurityConfiguration extends WebSecurityConfigurerAdapter {
     // Authorization
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http
+        http.cors().and()
             .csrf().disable()
             .formLogin().disable()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
             .authorizeRequests()
-            .antMatchers("/", "/api/v1/auth/login", "/api/v1/auth/register")
-                .permitAll()
-            .antMatchers("api/v1/users/*").hasRole(ADMIN.name())
+                // Registrar por mientras
+                .mvcMatchers(HttpMethod.POST, "api/v1/users/sign-up").permitAll()
+                .mvcMatchers(HttpMethod.GET, "api/v1/shops/**").permitAll()
+                .antMatchers("/", "/login").permitAll()
             .anyRequest()
                 .authenticated()
             .and()

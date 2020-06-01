@@ -1,6 +1,8 @@
 package com.shopper.shopperapi.resources.controller;
 
+import com.shopper.shopperapi.models.Category;
 import com.shopper.shopperapi.models.Product;
+import com.shopper.shopperapi.services.CategoryService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -8,12 +10,16 @@ import io.swagger.annotations.Api;
 import com.shopper.shopperapi.services.ProductService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Clase que representa el servicio web de Productos
@@ -21,16 +27,13 @@ import java.util.List;
  *
  */
 @RestController
-@RequestMapping("/api/v1/products")
+@RequestMapping(value = "products", produces = "application/hal+json")
 @Api(tags = "Productos")
 @CrossOrigin(origins = "*")
 public class ProductController {
-    @Autowired
-    private final ProductService productService;
 
-    public ProductController(ProductService productService) {
-        this.productService = productService;
-    }
+    @Autowired
+    private ProductService productService;
 
     @GetMapping
     @ApiOperation(value = "Listar productos", notes = "Servicio para listar productos")
@@ -52,6 +55,17 @@ public class ProductController {
         Product product = this.productService.findById(id);
         return ResponseEntity.ok(product);
     }
+
+    //     Custom pagination for products
+//    @GetMapping("category/{idCategory}")
+//    public ResponseEntity<Page<Product>> getProductsByCategoryId(@PathVariable("idCategory") ObjectId idCategory,
+//                                                           @RequestParam Optional<Integer> page,
+//                                                           @RequestParam Optional<String> sortBy) {
+//
+//        Page<Product> productPagination = this.productService.getProductsPagesByCategoryId(idCategory, page, sortBy);
+//
+//        return ResponseEntity.ok(productPagination);
+//    }
 
     @PostMapping
     @ApiOperation(value = "Crear producto", notes = "Servicio para crear productos")
