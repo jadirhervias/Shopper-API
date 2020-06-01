@@ -12,7 +12,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "categories")
 public class Category {
     @Id
-    private ObjectId id = ObjectId.get();
+    private ObjectId id;
     private String name;
     @DBRef
     private List<Product> products;

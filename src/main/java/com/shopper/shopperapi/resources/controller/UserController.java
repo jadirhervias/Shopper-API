@@ -7,13 +7,11 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Api;
 import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import javax.swing.text.html.Option;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import java.util.List;
@@ -25,11 +23,12 @@ import java.util.Optional;
  *
  */
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping(value = "users", produces = "application/hal+json")
+//@RequestMapping("/api/v1/users")
 @Api(tags = "Usuarios")
 @CrossOrigin(origins = "*")
 public class UserController {
-    @Autowired
+
     private final UserService userService;
 
     public UserController(UserService userService) {
@@ -69,6 +68,18 @@ public class UserController {
         @ApiResponse(code = 400, message = "Solicitud Inválida")
     })
     public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
+        user.setId(ObjectId.get());
+        User newUser = this.userService.create(user);
+        return new ResponseEntity<>(newUser, HttpStatus.CREATED);
+    }
+
+    @PostMapping(value = "/sign-up")
+    @ApiOperation(value = "Registro de usuario", notes = "Servicio para registro de usuarios")
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Usuario creado correctamente"),
+            @ApiResponse(code = 400, message = "Solicitud Inválida")
+    })
+    public ResponseEntity<User> register(@Valid @RequestBody User user) {
         user.setId(ObjectId.get());
         User newUser = this.userService.create(user);
         return new ResponseEntity<>(newUser, HttpStatus.CREATED);

@@ -1,9 +1,7 @@
 package com.shopper.shopperapi.services;
 
-import com.shopper.shopperapi.models.Catalog;
-import com.shopper.shopperapi.models.Category;
-import com.shopper.shopperapi.models.Product;
-import com.shopper.shopperapi.repositories.CatalogRepository;
+import com.shopper.shopperapi.models.Shop;
+import com.shopper.shopperapi.repositories.ShopRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,20 +11,20 @@ import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
-public class CatalogService {
-    @Autowired
-    private final CatalogRepository catalogRepository;
+public class ShopService {
 
-    public CatalogService(CatalogRepository catalogRepository) {
-        this.catalogRepository = catalogRepository;
+    private final ShopRepository shopRepository;
+
+    public ShopService(ShopRepository shopRepository) {
+        this.shopRepository = shopRepository;
     }
 
     /**
      * Método para listar los catálogos
      * @return List<Catalog>
      */
-    public List<Catalog> findAll() {
-        return this.catalogRepository.findAll();
+    public List<Shop> findAll() {
+        return this.shopRepository.findAll();
     }
 
     /**
@@ -37,8 +35,8 @@ public class CatalogService {
 //    public Catalog findById(String id) {
 //        return this.catalogRepository.findById(id);
 //    }
-    public Catalog findById(ObjectId id) {
-        return this.catalogRepository.findById(id);
+    public Shop findById(ObjectId id) {
+        return this.shopRepository.findById(id);
     }
 
     /**
@@ -61,34 +59,32 @@ public class CatalogService {
 
     /**
      * Método para crear catálogo
-     * @param catalog
+     * @param shop
      * @return Catalog
      */
     @Transactional
-    public Catalog create(Catalog catalog) {
-//        catalog.setId(ObjectId.get());
-        catalog.setId(ObjectId.get().toHexString());
-        return this.catalogRepository.save(catalog);
+    public Shop create(Shop shop) {
+        shop.setId(ObjectId.get());
+        return this.shopRepository.save(shop);
     }
 
     /**
      * Método para actualizar catálogo
      * @param id
-     * @param catalog
+     * @param shop
      */
     @Transactional
-    public void update(ObjectId id, Catalog catalog) {
-//        catalog.setId(id);
-        catalog.setId(id.toHexString());
-        this.catalogRepository.save(catalog);
+    public void update(ObjectId id, Shop shop) {
+        shop.setId(id);
+        this.shopRepository.save(shop);
     }
 
     /**
      * Método para eliminar catálogo
-     * @param catalog
+     * @param shop
      */
     @Transactional
-    public void delete(Catalog catalog) {
-        this.catalogRepository.delete(catalog);
+    public void delete(Shop shop) {
+        this.shopRepository.delete(shop);
     }
 }

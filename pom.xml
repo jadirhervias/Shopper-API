@@ -59,6 +59,12 @@
 			<optional>true</optional>
 		</dependency>
 
+		<!-- RESTful-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-hateoas</artifactId>
+		</dependency>
+
 		<!-- Google Guava -->
 		<dependency>
 			<groupId>com.google.guava</groupId>

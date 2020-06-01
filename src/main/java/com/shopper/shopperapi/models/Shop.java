@@ -1,13 +1,15 @@
 package com.shopper.shopperapi.models;
 
+import java.util.Date;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.*;
-import org.springframework.data.mongodb.repository.Query;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotNull;
 
@@ -15,37 +17,31 @@ import javax.validation.constraints.NotNull;
 // @Document annotation is used for the same purpose with @Entity annotation in JPA
 @Data
 @Document(collection = "catalogs")
-public class Catalog {
+public class Shop {
+    //    @MongoId(FieldType.OBJECT_ID)
+    //    private ObjectId id;
     @Id
-//    @MongoId(FieldType.OBJECT_ID)
-//    private ObjectId id;
-    private String id = ObjectId.get().toHexString();
+    private ObjectId id;
     private String name;
     @NotNull
     @Field("last_update")
     @JsonProperty("last_update")
-    private String lastUpdate;
-    @DBRef
-    private List<Category> categories = null;
+    @DateTimeFormat
+    @LastModifiedDate
+    private Date lastUpdate;
 
-/*
     @DBRef
-    private List<UserAddress> addresses;
+    private List<Category> categories;
 
-    public User(){
-        addresses = new ArrayList<UserAddress>();
+    public String getId() {
+        return id.toHexString();
     }
-*/
 
     @Override
     public String toString() {
         return String.format(
-            "Catalog[id=%s, lastUpdate='%s']",
+            "Shop[id=%s, lastUpdate='%s']",
             id, lastUpdate
         );
     }
-
-//    public String getId() {
-//        return id.toHexString();
-//    }
 }

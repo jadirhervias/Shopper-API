@@ -20,11 +20,6 @@ public class Product {
     private String details;
     private double cost;
     private String format;
-    @Nullable
-    @Indexed(unique = true)
-    @Field("bar_code")
-    @JsonProperty("bar_code")
-    private String barCode;
     @NotNull
     @Field("last_update")
     @JsonProperty("last_update")

@@ -1,6 +1,9 @@
 package com.shopper.shopperapi;
 
+import com.shopper.shopperapi.repositories.ProductRepository;
 import com.shopper.shopperapi.repositories.UserRepository;
+import com.shopper.shopperapi.resources.controller.ProductController;
+import com.shopper.shopperapi.services.ProductService;
 import com.shopper.shopperapi.utils.apiKeyToken.ApiKeyTokenConfig;
 import com.shopper.shopperapi.utils.jwt.JwtConfig;
 import org.springframework.boot.SpringApplication;
