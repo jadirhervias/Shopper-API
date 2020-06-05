@@ -58,6 +58,16 @@ public class User {
     @JsonProperty("address")
     @NotNull(message = "La dirección es requerida")
     private String address;
+
+    @Field("address_lat")
+    @JsonProperty("address_lat")
+    @NotNull
+    private double user_lat;
+
+    @Field("address_lng")
+    @JsonProperty("address_lng")
+    @NotNull
+    private double user_lng;
     
     public String getId() {
         return id.toHexString();

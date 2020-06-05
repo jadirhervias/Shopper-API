@@ -33,6 +33,16 @@ public class Shop {
     @DBRef
     private List<Category> categories;
 
+    @NotNull
+    @Field("shop_lat")
+    @JsonProperty("shop_lat")
+    private double shop_lat;
+
+    @NotNull
+    @Field("shop_lng")
+    @JsonProperty("shop_lng")
+    private double shop_lng;
+
     public String getId() {
         return id.toHexString();
     }
