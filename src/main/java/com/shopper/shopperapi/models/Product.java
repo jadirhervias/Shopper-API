@@ -20,6 +20,8 @@ public class Product {
     private String details;
     private double cost;
     private String format;
+    private String brand;
+    private int stock;
     @NotNull
     @Field("last_update")
     @JsonProperty("last_update")

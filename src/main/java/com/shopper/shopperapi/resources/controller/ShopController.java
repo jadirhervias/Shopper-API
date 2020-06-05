@@ -72,6 +72,9 @@ public class ShopController {
     })
     public ResponseEntity<Shop> getShopById(@PathVariable("id") ObjectId id) {
         Shop shop = this.shopService.findById(id);
+        if (shop == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
         return ResponseEntity.ok(shop);
     }
 
@@ -93,12 +96,12 @@ public class ShopController {
         @ApiResponse(code = 201, message = "Catálogo actualizado correctamente"),
         @ApiResponse(code = 404, message = "Catálogo no encontrado")
     })
-    public ResponseEntity<Shop> updateShop(@PathVariable("id") ObjectId id, @Valid @RequestBody Shop shop) {
-        Shop newData = this.shopService.findById(id);
-        if (newData == null) {
+    public ResponseEntity<Shop> updateShop(@PathVariable("id") ObjectId id, @Valid @RequestBody Shop data) {
+        Shop shopToUpdate = this.shopService.findById(id);
+        if (shopToUpdate == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        this.shopService.update(id, newData);
+        this.shopService.update(id, data);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

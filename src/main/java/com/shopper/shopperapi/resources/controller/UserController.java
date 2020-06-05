@@ -57,7 +57,7 @@ public class UserController {
     })
     public ResponseEntity<User> getUserByEmail(@Valid @Email @RequestParam(value = "email") String email) {
         Optional<User> user = this.userService.findByEmail(email);
-        return ResponseEntity.ok(user.get());
+        return user.map(ResponseEntity::ok).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @PostMapping
@@ -92,7 +92,7 @@ public class UserController {
             @ApiResponse(code = 201, message = "Usuario actualizado correctamente"),
             @ApiResponse(code = 404, message = "Usuario no encontrado")
     })
-    public ResponseEntity<User> updateUser(@PathVariable("id") ObjectId id, @Valid @RequestBody User user) {
+    public ResponseEntity<User> updateUser(@PathVariable("id") ObjectId id, @Valid @RequestBody User userData) {
         Optional<User> userToUpdate = this.userService.findById(id);
 
         if (!userToUpdate.isPresent()) {
@@ -111,7 +111,7 @@ public class UserController {
 //        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
 //        this.userService.update(id, newData.get());
-        this.userService.update(id, user);
+        this.userService.update(id, userData);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

@@ -2,8 +2,10 @@ package com.shopper.shopperapi.services;
 
 import com.shopper.shopperapi.models.Category;
 import com.shopper.shopperapi.models.Product;
+import com.shopper.shopperapi.models.SubCategory;
 import com.shopper.shopperapi.repositories.CategoryRepository;
 import com.shopper.shopperapi.repositories.ProductRepository;
+import com.shopper.shopperapi.repositories.SubCategoriyRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,7 +27,7 @@ public class ProductService {
     @Autowired
     private ProductRepository productRepository;
     @Autowired
-    private CategoryRepository categoryRepository;
+    private SubCategoriyRepository subCategoriyRepository;
 
 
 //    @Autowired
@@ -45,9 +47,9 @@ public class ProductService {
     /**
      * Método para retornar una lista de productos paginados de cierta categoría
      */
-    public List<Product> getCategoryProducts(ObjectId idCategory) {
-        Category category = this.categoryRepository.findById(idCategory);
-        return category.getProducts();
+    public List<Product> getSubCategoryProducts(ObjectId idCategory) {
+        SubCategory subCategory = this.subCategoriyRepository.findById(idCategory);
+        return subCategory.getProducts();
     }
 
 //    public Page<Product> getProductsPagesByCategoryId (ObjectId id, Optional<Integer> page,

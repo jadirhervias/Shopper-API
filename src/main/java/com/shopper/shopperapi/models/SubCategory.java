@@ -1,28 +1,27 @@
 package com.shopper.shopperapi.models;
 
-import java.util.Date;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.mongodb.core.mapping.*;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotNull;
+import java.util.Date;
+import java.util.List;
 
-// Para construir un POJO (getters y setters)
-// @Document annotation is used for the same purpose with @Entity annotation in JPA
 @Data
-@Document(collection = "shops")
-public class Shop {
-    //    private ObjectId id;
-//    @Id
-    @MongoId(FieldType.OBJECT_ID)
+@Document(collection = "sub_categories")
+public class SubCategory {
+    @Id
     private ObjectId id;
     private String name;
+    @DBRef
+    private List<Product> products;
     @NotNull
     @Field("last_update")
     @JsonProperty("last_update")
@@ -30,18 +29,7 @@ public class Shop {
     @LastModifiedDate
     private Date lastUpdate;
 
-    @DBRef
-    private List<Category> categories;
-
     public String getId() {
         return id.toHexString();
-    }
-
-    @Override
-    public String toString() {
-        return String.format(
-            "Shop[id=%s, lastUpdate='%s']",
-            id, lastUpdate
-        );
     }
 }

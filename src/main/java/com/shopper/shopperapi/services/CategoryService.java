@@ -51,20 +51,6 @@ public class CategoryService {
     }
 
     /**
-     * Obtener una lista de productos por categoría para paginar
-     * @param id
-     * @return List<?>
-     */
-    public List<Product> findProductsByCategoryId(ObjectId id) {
-        List<Product> products = findById(id).getProducts();
-        return products;
-    }
-    public List<Product> findProductsById(ObjectId id) {
-        List<Product> products = findById(id).getProducts();
-        return products;
-    }
-
-    /**
      * Método para crear categoría
      * @param category
      * @return Category

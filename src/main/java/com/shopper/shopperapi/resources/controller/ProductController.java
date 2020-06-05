@@ -53,6 +53,11 @@ public class ProductController {
     })
     public ResponseEntity<Product> getProductById(@PathVariable("id") ObjectId id) {
         Product product = this.productService.findById(id);
+        
+        if (product == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
         return ResponseEntity.ok(product);
     }
 
@@ -85,12 +90,12 @@ public class ProductController {
         @ApiResponse(code = 201, message = "Producto actualizado correctamente"),
         @ApiResponse(code = 404, message = "Producto no encontrado")
     })
-    public ResponseEntity<Product> updateProduct(@PathVariable("id") ObjectId id, @Valid @RequestBody Product product) {
-        Product newData = this.productService.findById(id);
-        if (newData == null) {
+    public ResponseEntity<Product> updateProduct(@PathVariable("id") ObjectId id, @Valid @RequestBody Product productData) {
+        Product productToUpdate = this.productService.findById(id);
+        if (productToUpdate == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        this.productService.update(id, newData);
+        this.productService.update(id, productData);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

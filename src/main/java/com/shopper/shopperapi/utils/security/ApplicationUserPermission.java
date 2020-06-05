@@ -7,6 +7,8 @@ public enum ApplicationUserPermission {
     CATALOGS_WRITE("catalogs:write"),
     CATEGORIES_READ("categories:read"),
     CATEGORIES_WRITE("categories:write"),
+    SUBCATEGORIES_READ("subcategories:read"),
+    SUBCATEGORIES_WRITE("subcategories:write"),
     PRODUCTS_READ("products:read"),
     PRODUCTS_WRITE("products:write"),
     SHOPS_READ("shops:read"),

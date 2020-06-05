@@ -28,10 +28,6 @@ public class CategoryController {
     @Autowired
     private CategoryService categoryService ;
 
-//    public CategoryController(CategoryService categoryService) {
-//        this.categoryService = categoryService;
-//    }
-
     @GetMapping
     @ApiOperation(value = "Listar categorías", notes = "Servicio para listar categorias")
     @ApiResponses(value = {
@@ -69,6 +65,11 @@ public class CategoryController {
     })
     public ResponseEntity<Category> getCategoryById(@PathVariable("id") ObjectId id) {
         Category category = this.categoryService.findById(id);
+
+        if (category == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
         return ResponseEntity.ok(category);
     }
 
@@ -90,12 +91,12 @@ public class CategoryController {
         @ApiResponse(code = 201, message = "Categoría actualizada correctamente"),
         @ApiResponse(code = 404, message = "Categoría no encontrado")
     })
-    public ResponseEntity<Category> updateCategory(@PathVariable("id") ObjectId id, @Valid @RequestBody Category category) {
-        Category newData = this.categoryService.findById(id);
-        if (newData == null) {
+    public ResponseEntity<Category> updateCategory(@PathVariable("id") ObjectId id, @Valid @RequestBody Category categoryData) {
+        Category categoryToUpdate = this.categoryService.findById(id);
+        if (categoryToUpdate == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        this.categoryService.update(id, newData);
+        this.categoryService.update(id, categoryData);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

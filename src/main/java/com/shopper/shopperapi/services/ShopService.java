@@ -64,7 +64,7 @@ public class ShopService {
      */
     @Transactional
     public Shop create(Shop shop) {
-        shop.setId(ObjectId.get());
+//        shop.setId(ObjectId.get());
         return this.shopRepository.save(shop);
     }
 
