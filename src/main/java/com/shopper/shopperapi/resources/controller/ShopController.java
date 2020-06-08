@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.awt.print.Pageable;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.List;
 
 @RestController

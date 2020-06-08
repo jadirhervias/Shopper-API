@@ -30,4 +30,26 @@ public class Category {
     public String getId() {
         return id.toHexString();
     }
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public List<SubCategory> getSubCategories() {
+		return subCategories;
+	}
+
+	public void setSubCategories(List<SubCategory> subCategories) {
+		this.subCategories = subCategories;
+	}
+
+	public void setId(ObjectId id) {
+		this.id = id;
+	}
+    
+    
 }

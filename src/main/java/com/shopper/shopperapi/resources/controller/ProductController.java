@@ -1,8 +1,6 @@
 package com.shopper.shopperapi.resources.controller;
 
-import com.shopper.shopperapi.models.Category;
 import com.shopper.shopperapi.models.Product;
-import com.shopper.shopperapi.services.CategoryService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -10,16 +8,12 @@ import io.swagger.annotations.Api;
 import com.shopper.shopperapi.services.ProductService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Clase que representa el servicio web de Productos

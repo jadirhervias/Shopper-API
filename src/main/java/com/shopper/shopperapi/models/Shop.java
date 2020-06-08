@@ -54,4 +54,49 @@ public class Shop {
             id, lastUpdate
         );
     }
+
+    public double getShop_lat() {
+        return shop_lat;
+    }
+
+    public void setShop_lat(double shop_lat) {
+        this.shop_lat = shop_lat;
+    }
+
+    public double getShop_lng() {
+        return shop_lng;
+    }
+
+    public void setShop_lng(double shop_lng) {
+        this.shop_lng = shop_lng;
+    }
+
+    public void setId(ObjectId id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Date getLastUpdate() {
+        return lastUpdate;
+    }
+
+    public void setLastUpdate(Date lastUpdate) {
+        this.lastUpdate = lastUpdate;
+    }
+
+    public List<Category> getCategories() {
+        return categories;
+    }
+
+    public void setCategories(List<Category> categories) {
+        this.categories = categories;
+    }
+    
 }
