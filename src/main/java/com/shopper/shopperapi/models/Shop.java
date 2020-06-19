@@ -6,7 +6,6 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.*;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -18,7 +17,6 @@ import javax.validation.constraints.NotNull;
 @Data
 @Document(collection = "shops")
 public class Shop {
-    //    private ObjectId id;
 //    @Id
     @MongoId(FieldType.OBJECT_ID)
     private ObjectId id;

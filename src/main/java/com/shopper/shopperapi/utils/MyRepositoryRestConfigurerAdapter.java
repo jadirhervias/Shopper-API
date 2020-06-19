@@ -1,7 +1,6 @@
 package com.shopper.shopperapi.utils;
 
 import com.shopper.shopperapi.models.*;
-import com.shopper.shopperapi.repositories.ProductRepository;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer;

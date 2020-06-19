@@ -1,24 +1,15 @@
 package com.shopper.shopperapi.services;
 
-import com.shopper.shopperapi.models.Category;
 import com.shopper.shopperapi.models.Product;
 import com.shopper.shopperapi.models.SubCategory;
-import com.shopper.shopperapi.repositories.CategoryRepository;
+import com.shopper.shopperapi.repositories.ImageRepository;
 import com.shopper.shopperapi.repositories.ProductRepository;
 import com.shopper.shopperapi.repositories.SubCategoriyRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestParam;
-
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -28,16 +19,11 @@ public class ProductService {
     private ProductRepository productRepository;
     @Autowired
     private SubCategoriyRepository subCategoriyRepository;
-
-
-//    @Autowired
-//    public ProductService(ProductRepository productRepository, CategoryService categoryService) {
-//        this.productRepository = productRepository;
-//        this.categoryService = categoryService;
-//    }
+    @Autowired
+    private ImageRepository imageRepository;
 
     /**
-     * Método para listar usuarios
+     * Método para listar productos
      * @return List<Product>
      */
     public List<Product> findAll() {

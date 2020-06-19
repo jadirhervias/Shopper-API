@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.web.client.RestTemplate;
 
-//@EnableAutoConfiguration
 @SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
 @EnableMongoRepositories(basePackageClasses = UserRepository.class)
 @EnableConfigurationProperties({JwtConfig.class, ApiKeyTokenConfig.class})
@@ -25,6 +24,7 @@ public class ShopperApiApplication {
 	public RestTemplate getRestTemplate() {
 		return new RestTemplate();
 	}
+
 /*
 	@Bean
 	public ValidatingMongoEventListener validatingMongoEventListener() {

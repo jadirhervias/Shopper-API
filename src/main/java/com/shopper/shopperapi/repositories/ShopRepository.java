@@ -5,11 +5,11 @@ import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 //import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
+
 //import org.springframework.web.bind.annotation.CrossOrigin;
 
 // No need implementation, just one interface, and you ave CRUD
 @Repository
-//@CrossOrigin
 public interface ShopRepository extends MongoRepository<Shop, String> {
     Shop findById(ObjectId id);
 

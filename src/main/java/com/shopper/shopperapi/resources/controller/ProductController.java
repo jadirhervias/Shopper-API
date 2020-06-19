@@ -1,8 +1,8 @@
 package com.shopper.shopperapi.resources.controller;
 
-import com.shopper.shopperapi.models.Category;
+import com.shopper.shopperapi.models.Image;
 import com.shopper.shopperapi.models.Product;
-import com.shopper.shopperapi.services.CategoryService;
+import com.shopper.shopperapi.services.ImageService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -10,14 +10,17 @@ import io.swagger.annotations.Api;
 import com.shopper.shopperapi.services.ProductService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,6 +37,8 @@ public class ProductController {
 
     @Autowired
     private ProductService productService;
+    @Autowired
+    private ImageService imageService;
 
     @GetMapping
     @ApiOperation(value = "Listar productos", notes = "Servicio para listar productos")
@@ -72,16 +77,34 @@ public class ProductController {
 //        return ResponseEntity.ok(productPagination);
 //    }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ApiOperation(value = "Crear producto", notes = "Servicio para crear productos")
     @ApiResponses(value = {
         @ApiResponse(code = 201, message = "Producto creado correctamente"),
         @ApiResponse(code = 400, message = "Solicitud Inválida")
     })
-    public ResponseEntity<Product> createProduct(@Valid @RequestBody Product product) {
-        product.setId(ObjectId.get());
+    public ResponseEntity<Product> createProduct(
+            @RequestPart(value = "image") MultipartFile file,
+            @RequestPart(value = "product") @Valid Product product) throws IOException {
+        Image image = imageService.addImage(file);
+        ObjectId newProductId = ObjectId.get();
+        product.setId(newProductId);
+        product.setImage(image);
         Product newProduct = this.productService.create(product);
         return new ResponseEntity<>(newProduct, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/image/add")
+    public ResponseEntity<?> createProductWithImage(
+            @RequestParam("image") MultipartFile file) throws IOException {
+            imageService.addImage(file);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/image/{id}")
+    public ResponseEntity<Image> getImage(@PathVariable String id) throws UnsupportedEncodingException {
+        Image image = imageService.getImageById(id);
+        return ResponseEntity.ok(image);
     }
 
     @PutMapping("/{id}")
