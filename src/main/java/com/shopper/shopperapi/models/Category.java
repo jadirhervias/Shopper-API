@@ -20,7 +20,6 @@ public class Category {
     @JsonProperty("sub_categories")
     @DBRef
     private List<SubCategory> subCategories;
-//    private List<Product> products;
 
     @Override
     public String toString() {

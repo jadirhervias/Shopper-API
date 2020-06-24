@@ -6,20 +6,16 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotNull;
 
-// Para construir un POJO (getters y setters)
-// @Document annotation is used for the same purpose with @Entity annotation in JPA
 @Data
 @Document(collection = "shops")
 public class Shop {
-    //    private ObjectId id;
-//    @Id
+
     @MongoId(FieldType.OBJECT_ID)
     private ObjectId id;
     private String name;

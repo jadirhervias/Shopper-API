@@ -5,16 +5,11 @@ import com.shopper.shopperapi.models.Shop;
 import com.shopper.shopperapi.repositories.ShopRepository;
 import com.shopper.shopperapi.utils.distance.DistanceCalculated;
 import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.Console;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.LinkedTransferQueue;
 
 @Service
 @Transactional(readOnly = true)
@@ -101,13 +96,13 @@ public class ShopService {
     		if(id == null) {
             	List<Shop> tiendas = shopRepository.findAll();
                 for (int i=0; i<tiendas.size();i++){
-                    double distancia = distanceCalculated.distanceCoord(user_lat,user_lng,tiendas.get(i).getShop_lat(),tiendas.get(i).getShop_lng());
+                    double distancia = DistanceCalculated.distanceCoord(user_lat,user_lng,tiendas.get(i).getShop_lat(),tiendas.get(i).getShop_lng());
                     tiendas.get(i).setCategories(null);
                     ordenar.add(new ResponseShopsOrder(distancia, tiendas.get(i)));
                 }
             }else {
             	Shop shop = shopRepository.findById(id);
-            	double distancia = distanceCalculated.distanceCoord(user_lat,user_lng,shop.getShop_lat(),shop.getShop_lng());
+            	double distancia = DistanceCalculated.distanceCoord(user_lat,user_lng,shop.getShop_lat(),shop.getShop_lng());
             	shop.setCategories(null);
             	ordenar.add(new ResponseShopsOrder(distancia, shop));
             }
