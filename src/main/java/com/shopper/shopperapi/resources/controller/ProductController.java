@@ -17,12 +17,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.Base64;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Clase que representa el servicio web de Productos

@@ -12,7 +12,7 @@ class MyRepositoryRestConfigurerAdapter implements RepositoryRestConfigurer {
 
     @Override
     public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config) {
-        config.exposeIdsFor(Shop.class, Category.class, Product.class, User.class, SubCategory.class);
+        config.exposeIdsFor(Shop.class, Category.class, Product.class, User.class, SubCategory.class, Image.class);
         config.useHalAsDefaultJsonMediaType(false);
         config.setPageParamName("pageNumber");
 //        config.setSortParamName("name");
