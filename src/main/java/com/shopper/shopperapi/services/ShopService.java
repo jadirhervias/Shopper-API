@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -121,6 +120,7 @@ public class ShopService {
                 double distance = DistanceCalculated.distanceCoord(
                         userLat, userLng, shop.getShopLat(), shop.getShopLng()
                 );
+
             	shop.setCategories(null);
             	orderedShops.add(new ResponseShopsOrder(distance, shop));
 

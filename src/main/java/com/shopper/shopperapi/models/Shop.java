@@ -12,8 +12,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.constraints.NotNull;
 
-// Para construir un POJO (getters y setters)
-// @Document annotation is used for the same purpose with @Entity annotation in JPA
 @Data
 @Document(collection = "shops")
 public class Shop {
@@ -48,8 +46,8 @@ public class Shop {
     @Override
     public String toString() {
         return String.format(
-            "Shop[id=%s, lastUpdate='%s']",
-            id, lastUpdate
+                "Shop[id=%s, lastUpdate='%s']",
+                id, lastUpdate
         );
     }
 }
