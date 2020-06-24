@@ -37,11 +37,9 @@ public class User {
     @Indexed(unique = true)
     private String email;
     
-    // TODO : Default role is USER
-//    @Value("${role: ROLE_USER}")
     @Field("role")
     @JsonProperty("role")
-    private String role = "ROLE_CUSTOMER"; // Default
+    private String role = "ROLE_CUSTOMER"; 
     
     @NotNull(message = "La contraseña es requerida")
     @Field("password")
