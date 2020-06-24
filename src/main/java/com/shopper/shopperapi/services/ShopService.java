@@ -4,24 +4,21 @@ import com.shopper.shopperapi.models.ResponseShopsOrder;
 import com.shopper.shopperapi.models.Shop;
 import com.shopper.shopperapi.repositories.ShopRepository;
 import com.shopper.shopperapi.utils.distance.DistanceCalculated;
+
 import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.Console;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.LinkedTransferQueue;
 
 @Service
 @Transactional(readOnly = true)
 public class ShopService {
 
     private final ShopRepository shopRepository;
-    private DistanceCalculated distanceCalculated;
+//    private DistanceCalculated distanceCalculated;
 
     public ShopService(ShopRepository shopRepository) {
         this.shopRepository = shopRepository;
@@ -96,21 +93,39 @@ public class ShopService {
         this.shopRepository.delete(shop);
     }
 
-    public List<ResponseShopsOrder> OrdenarTiendas(Double user_lat,Double user_lng,ObjectId id){
-    	List<ResponseShopsOrder> ordenar=new ArrayList<ResponseShopsOrder>();
+    public List<ResponseShopsOrder> getNearestShopsForUser(Double userLat, Double userLng, String id){
+
+        List<ResponseShopsOrder> orderedShops = new ArrayList<ResponseShopsOrder>();
+
+            // Ordenar tiendas por distancia al usuario
     		if(id == null) {
-            	List<Shop> tiendas = shopRepository.findAll();
-                for (int i=0; i<tiendas.size();i++){
-                    double distancia = distanceCalculated.distanceCoord(user_lat,user_lng,tiendas.get(i).getShop_lat(),tiendas.get(i).getShop_lng());
-                    tiendas.get(i).setCategories(null);
-                    ordenar.add(new ResponseShopsOrder(distancia, tiendas.get(i)));
+
+            	List<Shop> shops = shopRepository.findAll();
+                for (Shop shop : shops) {
+                    double distance = DistanceCalculated.distanceCoord(
+                            userLat, userLng, shop.getShopLat(), shop.getShopLng()
+                    );
+                    shop.setCategories(null);
+                    orderedShops.add(new ResponseShopsOrder(distance, shop));
                 }
-            }else {
-            	Shop shop = shopRepository.findById(id);
-            	double distancia = distanceCalculated.distanceCoord(user_lat,user_lng,shop.getShop_lat(),shop.getShop_lng());
+
+            // Mostrar distancia de la tienda al usuario
+            } else {
+
+            	Shop shop = shopRepository.findById(new ObjectId(id));
+//            	double distancia = distanceCalculated.distanceCoord(
+
+                /**
+                 * TODO: Validar si la tienda no se encuentra (Muestra ERROR 500!!!!)
+                 */
+                double distance = DistanceCalculated.distanceCoord(
+                        userLat, userLng, shop.getShopLat(), shop.getShopLng()
+                );
             	shop.setCategories(null);
-            	ordenar.add(new ResponseShopsOrder(distancia, shop));
+            	orderedShops.add(new ResponseShopsOrder(distance, shop));
+
             }
-        return ordenar;
+
+    		return orderedShops;
     }
 }

@@ -1,5 +1,7 @@
 package com.shopper.shopperapi.resources.controller;
 
+import com.shopper.shopperapi.models.Coordenates;
+import com.shopper.shopperapi.models.ResponseShopsOrder;
 import com.shopper.shopperapi.models.Shop;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -20,9 +22,11 @@ import org.springframework.http.ResponseEntity;
 //import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Nullable;
 import javax.validation.Valid;
 import java.awt.print.Pageable;
 import java.net.URISyntaxException;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -63,6 +67,36 @@ public class ShopController {
 
 //        return ResponseEntity.ok(resources);
         return ResponseEntity.ok(shops);
+    }
+
+    /**
+     * Obtener las tiendas ordenadas según la distancia a la que se encuentran del usuario
+     */
+    @GetMapping("/sorted")
+    public ResponseEntity<?> getNearestShopsForUser(@RequestBody @Valid Coordenates coordenates) {
+
+        double userLat = coordenates.getLatitude();
+        double userLng = coordenates.getLongitude();
+
+        List<ResponseShopsOrder> nearestShops = shopService.getNearestShopsForUser(userLat, userLng, null);
+        nearestShops.sort(Comparator.comparing(ResponseShopsOrder::getDistance));
+
+        return ResponseEntity.ok(nearestShops);
+    }
+
+    /**
+     * Obtener la distancia entre la tienda y el usuario
+     */
+    @GetMapping("/distance/{shopId}")
+    public ResponseEntity<?> getShopDistanceForUser(
+            @RequestBody @Valid Coordenates coordenates,
+            @PathVariable("shopId") @Nullable String shopId) {
+
+        double userLat = coordenates.getLatitude();
+        double userLng = coordenates.getLongitude();
+
+        List<ResponseShopsOrder> shopDistance = shopService.getNearestShopsForUser(userLat, userLng, shopId);
+        return ResponseEntity.ok(shopDistance);
     }
 
     @GetMapping("/{id}")
