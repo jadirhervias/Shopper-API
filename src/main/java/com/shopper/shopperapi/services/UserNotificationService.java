@@ -11,7 +11,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
-import static com.shopper.shopperapi.utils.firebase.DeviceGroupsOperations.*;
+import static com.shopper.shopperapi.utils.notification.DeviceGroupsOperations.*;
 
 @Service
 public class UserNotificationService {

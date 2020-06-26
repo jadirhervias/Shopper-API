@@ -1,6 +1,7 @@
 package com.shopper.shopperapi.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.mongodb.lang.Nullable;
 import lombok.Data;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
@@ -68,6 +69,7 @@ public class User {
     @NotNull
     private double userLng;
 
+    @Nullable
     @Field("notification_device_group")
     @JsonProperty("notification_device_group")
     private Map<String, String> notificationDeviceGroup;
@@ -80,17 +82,17 @@ public class User {
         return id;
     }
 
-    public String getUserNotificationKey() {
-        return notificationDeviceGroup.get("notification_key");
-    }
+//    public String getUserNotificationKey() {
+//        return notificationDeviceGroup.get("notification_key");
+//    }
 
     public void setUserNotificationKey(String userNotificationKey) {
         this.notificationDeviceGroup.replace("notification_key", userNotificationKey);
     }
 
-    public String getUserNotificationKeyName() {
-        return notificationDeviceGroup.get("notification_key_name");
-    }
+//    public String getUserNotificationKeyName() {
+//        return notificationDeviceGroup.get("notification_key_name");
+//    }
 
     public void setUserNotificationKeyName(String userNotificationKeyName) {
         this.notificationDeviceGroup.replace("notification_key_name", userNotificationKeyName);

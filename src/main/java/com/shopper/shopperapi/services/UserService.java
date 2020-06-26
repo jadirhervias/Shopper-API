@@ -52,13 +52,25 @@ public class UserService {
     }
 
     /**
+     * Método para obtener el nombre del usuario
+     * @param id
+     * @return String
+     */
+    public String getUserFirstName(String id) {
+        User user = userRepository.findById(id).get();
+        return user.getFirstName();
+    }
+
+    /**
      * Método para buscar notification key por ID del usuario
      * @param id
      * @return String
      */
     public String getUserNotificationKey(String id) {
         User user = userRepository.findById(id).get();
-        return user.getUserNotificationKey();
+//        return user.getUserNotificationKey();
+        assert user.getNotificationDeviceGroup() != null;
+        return user.getNotificationDeviceGroup().get("notification_key");
     }
 
     /**
@@ -68,7 +80,9 @@ public class UserService {
      */
     public String getUserNotificationKeyName(String id) {
         User user = userRepository.findById(id).get();
-        return user.getUserNotificationKeyName();
+//        return user.getUserNotificationKeyName();
+        assert user.getNotificationDeviceGroup() != null;
+        return user.getNotificationDeviceGroup().get("notification_key_name");
     }
 
     /**

@@ -1,4 +1,4 @@
-package com.shopper.shopperapi.utils.firebase;
+package com.shopper.shopperapi.utils.notification;
 
 public enum DeviceGroupsOperations {
     CREATE_DEVICE_GROUP("create"),
