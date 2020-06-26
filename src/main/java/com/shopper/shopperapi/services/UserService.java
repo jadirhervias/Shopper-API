@@ -52,6 +52,26 @@ public class UserService {
     }
 
     /**
+     * Método para buscar notification key por ID del usuario
+     * @param id
+     * @return String
+     */
+    public String getUserNotificationKey(String id) {
+        User user = userRepository.findById(id).get();
+        return user.getUserNotificationKey();
+    }
+
+    /**
+     * Método para buscar notification key name por ID del usuario
+     * @param id
+     * @return String
+     */
+    public String getUserNotificationKeyName(String id) {
+        User user = userRepository.findById(id).get();
+        return user.getUserNotificationKeyName();
+    }
+
+    /**
      * Método para crear usuario
      * @param user
      * @return User

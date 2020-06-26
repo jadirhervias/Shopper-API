@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
+import java.util.Map;
 
 @Data
 @Document(collection = "users")
@@ -66,8 +67,32 @@ public class User {
     @JsonProperty("user_lng")
     @NotNull
     private double userLng;
+
+    @Field("notification_device_group")
+    @JsonProperty("notification_device_group")
+    private Map<String, String> notificationDeviceGroup;
     
     public String getId() {
         return id.toHexString();
+    }
+
+    public ObjectId getObjectId() {
+        return id;
+    }
+
+    public String getUserNotificationKey() {
+        return notificationDeviceGroup.get("notification_key");
+    }
+
+    public void setUserNotificationKey(String userNotificationKey) {
+        this.notificationDeviceGroup.replace("notification_key", userNotificationKey);
+    }
+
+    public String getUserNotificationKeyName() {
+        return notificationDeviceGroup.get("notification_key_name");
+    }
+
+    public void setUserNotificationKeyName(String userNotificationKeyName) {
+        this.notificationDeviceGroup.replace("notification_key_name", userNotificationKeyName);
     }
 }

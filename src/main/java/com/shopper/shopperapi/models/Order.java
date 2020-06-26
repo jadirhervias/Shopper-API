@@ -6,7 +6,6 @@ import java.util.List;
 import javax.validation.constraints.NotNull;
 
 import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -64,6 +63,6 @@ public class Order {
 	private Integer totalProduc;
 	
 	@NotNull
-	private Pago pago;
+	private Charge charge;
 	
 }
