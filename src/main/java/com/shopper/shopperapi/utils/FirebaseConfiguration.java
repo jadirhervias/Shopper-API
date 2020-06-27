@@ -16,8 +16,10 @@ import java.io.InputStream;
 
 @Configuration
 public class FirebaseConfiguration {
+
+    // Clase para obtener instancia de Firebase Realtime Database
     @Bean
-    public DatabaseReference firebaseDatabse() {
+    public DatabaseReference firebaseDatabase() {
         return FirebaseDatabase.getInstance().getReference();
     }
 
@@ -28,7 +30,8 @@ public class FirebaseConfiguration {
     private String configPath;
 
     @PostConstruct
-    public void init() throws IOException {
+    public void init() {
+//        throws IOException {
 
         /**
          * Using Firebase service account
@@ -36,15 +39,19 @@ public class FirebaseConfiguration {
 
 //        FileInputStream serviceAccount = new FileInputStream("path/to/serviceAccountKey.json");
 
-        InputStream inputStream = FirebaseConfiguration.class.getClassLoader().getResourceAsStream(configPath);
-        assert inputStream != null;
+        try {
+            InputStream serviceAccount = FirebaseConfiguration.class.getClassLoader().getResourceAsStream(configPath);
+            assert serviceAccount != null;
 
-        FirebaseOptions options = new FirebaseOptions.Builder()
-                .setCredentials(GoogleCredentials.fromStream(inputStream))
-                .setDatabaseUrl(databaseUrl)
-                .build();
+            FirebaseOptions options = new FirebaseOptions.Builder()
+                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                    .setDatabaseUrl(databaseUrl)
+                    .build();
 
-        FirebaseApp.initializeApp(options);
+            FirebaseApp.initializeApp(options);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 }

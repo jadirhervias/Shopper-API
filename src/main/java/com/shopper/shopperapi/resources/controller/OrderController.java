@@ -5,7 +5,9 @@ import com.shopper.shopperapi.services.OrderService;
 import com.shopper.shopperapi.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.MediaTypes;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +25,15 @@ public class OrderController {
     @Autowired
     private FCMService fcmService;
 
+    @PostMapping("/{customerId}")
+    @PreAuthorize("hasAuthority('orders:write')")
+    public ResponseEntity<?> createOrder(@PathVariable("customerId") String customerId) {
+//        Order order = new Order();
+        orderService.newOrder(userService.getUserNotificationKey(customerId));
+
+        return new ResponseEntity<>(null, HttpStatus.CREATED);
+    }
+
     @PostMapping("/arrived/{shopperId}/{customerId}")
     @PreAuthorize("hasRole('ROLE_SHOPPER')")
     public void sendNotificationToCustomer(
@@ -39,26 +50,5 @@ public class OrderController {
                 senderKey,
                 MESSAGE_TITLE.getMessage() + userName,
                 ORDER_ARRIVED_MESSAGE_BODY.getMessage());
-    }
-
-    @PostMapping("/{customerId}")
-    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
-    public void sendNotificationToCustomer(
-            @PathVariable("customerId") String customerId
-    ) {
-
-//        User customer = userService.findById(new ObjectId(customerId)).get();
-//
-//        String userName = customer.getFirstName();
-//        String userDeviceGroupKey = customer.getUserNotificationKeyName();
-
-        // Device group name key de shoppers más cercanos
-//        String senderKey = shopper.getUserNotificationKeyName();
-
-//        fcmService.sendPushNotificationToCustomer(
-//                userDeviceGroupKey,
-//                senderKey,
-//                MESSAGE_TITLE.getMessage() + userName,
-//                ORDER_ARRIVED_MESSAGE_BODY.getMessage());
     }
 }

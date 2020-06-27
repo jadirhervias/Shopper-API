@@ -11,10 +11,12 @@ import static com.shopper.shopperapi.utils.security.ApplicationUserPermission.*;
 
 public enum ApplicationUserRole {
     CUSTOMER(Sets.newHashSet(
-            USERS_WRITE, SHOPS_READ, CATALOGS_READ, CATEGORIES_READ, SUBCATEGORIES_READ, PRODUCTS_READ
+            USERS_WRITE, SHOPS_READ, CATALOGS_READ, CATEGORIES_READ, SUBCATEGORIES_READ,
+            PRODUCTS_READ, ORDERS_WRITE, ORDERS_READ
     )),
     SHOPPER(Sets.newHashSet(
-            USERS_READ, USERS_WRITE, SHOPS_READ, CATALOGS_READ, CATEGORIES_READ, SUBCATEGORIES_READ, PRODUCTS_READ
+            USERS_READ, USERS_WRITE, SHOPS_READ, CATALOGS_READ, CATEGORIES_READ, SUBCATEGORIES_READ,
+            PRODUCTS_READ, ORDERS_READ
     )),
     ADMIN(Sets.newHashSet(
             USERS_WRITE, USERS_READ,
@@ -22,7 +24,8 @@ public enum ApplicationUserRole {
             CATEGORIES_WRITE, CATEGORIES_READ,
             SUBCATEGORIES_WRITE, SUBCATEGORIES_READ,
             SHOPS_WRITE, SHOPS_READ,
-            PRODUCTS_WRITE, PRODUCTS_READ
+            PRODUCTS_WRITE, PRODUCTS_READ,
+            ORDERS_WRITE, ORDERS_READ
     ));
 
     private final Set<ApplicationUserPermission> permissions;

@@ -1,5 +1,6 @@
 package com.shopper.shopperapi;
 
+import com.google.firebase.database.FirebaseDatabase;
 import com.shopper.shopperapi.repositories.UserRepository;
 import com.shopper.shopperapi.utils.apiKeyToken.ApiKeyTokenConfig;
 import com.shopper.shopperapi.utils.jwt.JwtConfig;

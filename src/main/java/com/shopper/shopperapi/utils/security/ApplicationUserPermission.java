@@ -12,7 +12,9 @@ public enum ApplicationUserPermission {
     PRODUCTS_READ("products:read"),
     PRODUCTS_WRITE("products:write"),
     SHOPS_READ("shops:read"),
-    SHOPS_WRITE("shops:write");
+    SHOPS_WRITE("shops:write"),
+    ORDERS_READ("orders:read"),
+    ORDERS_WRITE("orders:write");
 
     private final String permission;
 

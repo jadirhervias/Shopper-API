@@ -24,17 +24,17 @@ public class ShopService {
     }
 
     /**
-     * Método para listar los catálogos
-     * @return List<Catalog>
+     * Método para listar los tiendas
+     * @return List<Shop>
      */
     public List<Shop> findAll() {
         return this.shopRepository.findAll();
     }
 
     /**
-     * Método para buscar catálogo por id
+     * Método para buscar tienda por id
      * @param id
-     * @return Catalog
+     * @return Shop
      */
 //    public Catalog findById(String id) {
 //        return this.catalogRepository.findById(id);
@@ -44,16 +44,16 @@ public class ShopService {
     }
 
     /**
-     * Método para obtener las categorías de un catálogo
+     * Método para obtener las categorías de un tienda
      * @param id
-     * @return Catalog
+     * @return Shop
      */
 //    public List<Catalog> getCatalogCategories(ObjectId id) {
 //        return this.catalogRepository.getCategories(id);
 //    }
 
     /**
-     * Método para obtener los productos de un catálogo
+     * Método para obtener los productos de una tienda
      * @param id
      * @return Catalog
      */
@@ -62,9 +62,9 @@ public class ShopService {
 //    }
 
     /**
-     * Método para crear catálogo
+     * Método para crear una tienda
      * @param shop
-     * @return Catalog
+     * @return Shop
      */
     @Transactional
     public Shop create(Shop shop) {
@@ -73,7 +73,7 @@ public class ShopService {
     }
 
     /**
-     * Método para actualizar catálogo
+     * Método para actualizar tienda
      * @param id
      * @param shop
      */
@@ -84,7 +84,7 @@ public class ShopService {
     }
 
     /**
-     * Método para eliminar catálogo
+     * Método para eliminar tienda
      * @param shop
      */
     @Transactional
