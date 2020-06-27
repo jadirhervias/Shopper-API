@@ -18,7 +18,6 @@ public class FCMService {
     @Autowired
     private RestTemplate restTemplate;
 
-    // Notificar a todos los SHOPPERS más cercanos cuando un usuario CUSTOMER realizó una orden
     public void sendPushNotificationToShoppers(List<?> keys, String messageTitle, String messageBody) {
         FirebaseNotification firebaseNotification = new FirebaseNotification();
         firebaseNotification.setTitle(messageTitle);
