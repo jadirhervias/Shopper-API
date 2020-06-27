@@ -1,11 +1,13 @@
 package com.shopper.shopperapi.resources.controller;
 
+import com.shopper.shopperapi.models.Charge;
 import com.shopper.shopperapi.models.Order;
 import com.shopper.shopperapi.services.FCMService;
 import com.shopper.shopperapi.services.OrderService;
 import com.shopper.shopperapi.services.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -34,9 +36,14 @@ public class OrderController {
 
     @PostMapping("/{customerId}")
     @PreAuthorize("hasAuthority('orders:write')")
-    public ResponseEntity<?> createOrder(@PathVariable("customerId") String customerId, @RequestBody @Valid Order order) {
-//        Order order = new Order();
-        orderService.newOrder(userService.getUserNotificationKey(customerId), order);
+    public ResponseEntity<?> createOrder(@PathVariable("customerId") String customerId, @RequestBody @Valid Order order)
+            throws JSONException {
+        Charge charge = new Charge();
+
+        String customerDeviceGroupKey = userService.getUserNotificationKey(customerId);
+
+//        orderService.newOrder(customerDeviceGroupKey, order);
+        orderService.processOrder(order, charge, customerDeviceGroupKey);
 
         return new ResponseEntity<>(null, HttpStatus.CREATED);
     }

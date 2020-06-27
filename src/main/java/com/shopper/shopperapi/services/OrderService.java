@@ -1,7 +1,9 @@
 package com.shopper.shopperapi.services;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.google.firebase.database.*;
 import org.springframework.boot.configurationprocessor.json.JSONException;
@@ -32,6 +34,8 @@ public class OrderService {
 	@Autowired
 	private FirebaseConfiguration firebaseConfiguration;
 
+	private final DatabaseReference ordersRef = firebaseConfiguration.firebaseDatabase().child("orders");
+
 	private final String django = "http://54.200.195.251/api/pagos/";
 
 	@Autowired
@@ -44,6 +48,21 @@ public class OrderService {
 	// History of orders
 	public List<Order> finAll(){
 		return this.orderRepository.findAll();
+	}
+
+	/**
+	 * Método para crear una orden
+	 * @param order
+	 * @return Order
+	 */
+	@Transactional
+	public Order create(Order order) {
+//        shop.setId(ObjectId.get());
+		return this.orderRepository.save(order);
+	}
+
+	public String getOrderFirebaseDbRefKey(String orderId) {
+		return orderRepository.findById(orderId).get().getFirebaseDbReferenceKey();
 	}
 
 	// Process order charge
@@ -73,21 +92,8 @@ public class OrderService {
 		return true;
 	}
 
-	/**
-	 * Método para crear una orden
-	 * @param order
-	 * @return Order
-	 */
-	@Transactional
-	public Order create(Order order) {
-//        shop.setId(ObjectId.get());
-		return this.orderRepository.save(order);
-	}
-
 	// Expose order in Firebase cloud
 	public void newOrder(String customerNotificationKey, List<String> shoppersDeviceGroupKey, Order order) {
-
-		DatabaseReference ordersRef = firebaseConfiguration.firebaseDatabase().child("orders");
 
 		// Generate a reference to a new location and add some data using push()
 		DatabaseReference pushedOrderRef = ordersRef.push();
@@ -111,23 +117,55 @@ public class OrderService {
 //		ordersRef.child(orderId).setValueAsync(order);
 	}
 
-	public void updateOrderState(String OrderKey) {
+	public void updateOrderState(String orderFirebaseDbRefKey, int state) {
 
+		Map<String, Object> newOrderState = new HashMap<>();
+		newOrderState.put("nickname", state);
+
+		ordersRef.child(orderFirebaseDbRefKey).updateChildren(newOrderState, (databaseError, databaseReference) -> {
+			if (databaseError != null) {
+				System.out.println("Order could not be updated " + databaseError.getMessage());
+			} else {
+				// Notificar al shopper(s) más cercano
+				System.out.println("Order data updated successfully.");
+
+				switch (state) {
+					// Orden tomada
+					case 1:
+						fcmService.sendPushNotificationToCustomer(customerNotificationKey, shoppersDeviceGroupKey,
+								MESSAGE_TITLE.getMessage(), ORDER_TAKEN_MESSAGE_BODY.getMessage());
+
+					// Orden ya llegó
+					case 2:
+
+						// Eliminar order de firebase y pasarla al histórico de mongo db
+
+//						fcmService.sendPushNotificationToCustomer(customerNotificationKey, shoppersDeviceGroupKey,
+//								MESSAGE_TITLE.getMessage(), ORDER_TAKEN_MESSAGE_BODY.getMessage());
+
+					// Orden cancelada por customer
+					case 3:
+						fcmService.sendPushNotificationToShoppers(customerNotificationKey, shoppersDeviceGroupKey,
+								MESSAGE_TITLE.getMessage(), NEW_ORDER_MESSAGE_BODY.getMessage());
+
+				}
+			}
+		});
 	}
 
 	public boolean cardOperation(Charge data) throws JSONException {
 
 		boolean success;
-		
+
 		JSONObject param = new JSONObject();
 		param.put("amount", data.getAmount());
 		param.put("currency_code", data.getCurrency_code());
 		param.put("description", data.getDescription());
 		param.put("email", data.getEmail());
 		param.put("source_id", data.getSource_id());
-	
+
 		HttpEntity<String> httpEntity = new HttpEntity<>(param.toString());
-		
+
 		ResponseEntity<String> 	msm = restTemplate.exchange(django, HttpMethod.POST, httpEntity, String.class);
 
 		if (msm.getBody().equals("201")) {

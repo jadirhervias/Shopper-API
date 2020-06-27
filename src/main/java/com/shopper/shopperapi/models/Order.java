@@ -5,7 +5,9 @@ import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
+import lombok.Data;
 import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
@@ -15,8 +17,7 @@ import org.springframework.data.mongodb.core.mapping.MongoId;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.mongodb.lang.Nullable;
 
-import lombok.Builder;
-
+@Data
 @Document(collection = "purchases")
 public class Order {
 
@@ -28,6 +29,10 @@ public class Order {
 	@DBRef(db = "users")
 	@JsonProperty("id_user")
 	private User userId;
+
+	@Transient
+	@JsonProperty("firebase_db_reference_key")
+	private String firebaseDbReferenceKey;
 	
 	@Nullable
 	@Field("id_shoper")
@@ -41,13 +46,14 @@ public class Order {
 	private List<ShoppingCar> shoppingCar;
 	
 	@NotNull
-	@Builder.Default
+//	@Builder
 	private int estado = 0;
 	
 	@NotNull
 	@Field("fech_compra")
-	@Builder.Default
-	private Date fechCompra = (@NotNull Date) new java.util.Date();
+//	@Builder
+	private Date fechCompra;
+//	= (@NotNull Date) new java.util.Date();
 	
 	@Nullable
 	@Field("fech_entrega")
