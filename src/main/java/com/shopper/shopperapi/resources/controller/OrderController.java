@@ -1,8 +1,10 @@
 package com.shopper.shopperapi.resources.controller;
 
+import com.shopper.shopperapi.models.Order;
 import com.shopper.shopperapi.services.FCMService;
 import com.shopper.shopperapi.services.OrderService;
 import com.shopper.shopperapi.services.UserService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpStatus;
@@ -12,6 +14,11 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import static com.shopper.shopperapi.utils.notification.NotificationMessages.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -27,9 +34,9 @@ public class OrderController {
 
     @PostMapping("/{customerId}")
     @PreAuthorize("hasAuthority('orders:write')")
-    public ResponseEntity<?> createOrder(@PathVariable("customerId") String customerId) {
+    public ResponseEntity<?> createOrder(@PathVariable("customerId") String customerId, @RequestBody @Valid Order order) {
 //        Order order = new Order();
-        orderService.newOrder(userService.getUserNotificationKey(customerId));
+        orderService.newOrder(userService.getUserNotificationKey(customerId), order);
 
         return new ResponseEntity<>(null, HttpStatus.CREATED);
     }

@@ -26,4 +26,22 @@ public class ResponseShopsOrder{
 				distance, shop
 		);
 	}
+
+	public double getDistance() {
+		return distance;
+	}
+
+	public void setDistance(double distance) {
+		this.distance = distance;
+	}
+
+	public Shop getShop() {
+		return shop;
+	}
+
+	public void setShop(Shop shop) {
+		this.shop = shop;
+	}
+	
+	
 }

@@ -64,5 +64,85 @@ public class Order {
 	
 	@NotNull
 	private Charge charge;
-	
+
+	public ObjectId getId() {
+		return id;
+	}
+
+	public void setId(ObjectId id) {
+		this.id = id;
+	}
+
+	public User getUserId() {
+		return userId;
+	}
+
+	public void setUserId(User userId) {
+		this.userId = userId;
+	}
+
+	public User getShoperId() {
+		return shoperId;
+	}
+
+	public void setShoperId(User shoperId) {
+		this.shoperId = shoperId;
+	}
+
+	public List<ShoppingCar> getShoppingCar() {
+		return shoppingCar;
+	}
+
+	public void setShoppingCar(List<ShoppingCar> shoppingCar) {
+		this.shoppingCar = shoppingCar;
+	}
+
+	public int getEstado() {
+		return estado;
+	}
+
+	public void setEstado(int estado) {
+		this.estado = estado;
+	}
+
+	public Date getFechCompra() {
+		return fechCompra;
+	}
+
+	public void setFechCompra(Date fechCompra) {
+		this.fechCompra = fechCompra;
+	}
+
+	public Date getFechEntrega() {
+		return fechEntrega;
+	}
+
+	public void setFechEntrega(Date fechEntrega) {
+		this.fechEntrega = fechEntrega;
+	}
+
+	public String getDescripcion() {
+		return descripcion;
+	}
+
+	public void setDescripcion(String descripcion) {
+		this.descripcion = descripcion;
+	}
+
+	public Integer getTotalProduc() {
+		return totalProduc;
+	}
+
+	public void setTotalProduc(Integer totalProduc) {
+		this.totalProduc = totalProduc;
+	}
+
+	public Charge getCharge() {
+		return charge;
+	}
+
+	public void setCharge(Charge charge) {
+		this.charge = charge;
+	}
+
 }

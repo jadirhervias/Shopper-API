@@ -9,25 +9,22 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import com.shopper.shopperapi.services.ShopService;
 import org.bson.types.ObjectId;
-import org.springframework.data.domain.Page;
+//import org.springframework.data.domain.Page;
 import org.springframework.data.rest.core.annotation.RestResource;
-//import org.springframework.data.rest.webmvc.RepositoryRestController;
-import org.springframework.data.web.PageableDefault;
-import org.springframework.data.web.PagedResourcesAssembler;
-import org.springframework.hateoas.CollectionModel;
+//import org.springframework.data.web.PageableDefault;
+//import org.springframework.data.web.PagedResourcesAssembler;
+//import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-//import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Nullable;
 import javax.validation.Valid;
-import java.awt.print.Pageable;
+//import java.awt.print.Pageable;
 import java.net.URISyntaxException;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 
 @RestController
