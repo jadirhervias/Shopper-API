@@ -16,5 +16,21 @@ public class ShoppingCar {
 	@NotNull
 	@JsonProperty("quantity")
 	private Integer cantidad;
-	
+
+	public ObjectId getProducto() {
+		return producto;
+	}
+
+	public void setProducto(ObjectId producto) {
+		this.producto = producto;
+	}
+
+	public Integer getCantidad() {
+		return cantidad;
+	}
+
+	public void setCantidad(Integer cantidad) {
+		this.cantidad = cantidad;
+	}
+
 }

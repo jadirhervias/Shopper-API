@@ -50,4 +50,50 @@ public class Shop {
                 id, lastUpdate
         );
     }
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public Date getLastUpdate() {
+		return lastUpdate;
+	}
+
+	public void setLastUpdate(Date lastUpdate) {
+		this.lastUpdate = lastUpdate;
+	}
+
+	public List<Category> getCategories() {
+		return categories;
+	}
+
+	public void setCategories(List<Category> categories) {
+		this.categories = categories;
+	}
+
+	public double getShopLat() {
+		return shopLat;
+	}
+
+	public void setShopLat(double shopLat) {
+		this.shopLat = shopLat;
+	}
+
+	public double getShopLng() {
+		return shopLng;
+	}
+
+	public void setShopLng(double shopLng) {
+		this.shopLng = shopLng;
+	}
+
+	public void setId(ObjectId id) {
+		this.id = id;
+	}
+    
+    
 }
