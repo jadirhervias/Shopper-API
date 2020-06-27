@@ -1,6 +1,8 @@
 package com.shopper.shopperapi.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.mongodb.lang.Nullable;
+
 import lombok.Data;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
@@ -9,6 +11,8 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+
+import java.util.Map;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
@@ -67,6 +71,11 @@ public class User {
     @NotNull
     private double userLng;
     
+    @Nullable
+    @Field("notification_device_group")
+    @JsonProperty("notification_device_group")
+    private Map<String, String> notificationDeviceGroup;
+    
     public String getId() {
         return id.toHexString();
     }
@@ -89,6 +98,14 @@ public class User {
 
 	public String getEmail() {
 		return email;
+	}
+	
+	public Map<String, String> getNotificationDeviceGroup() {
+		return notificationDeviceGroup;
+	}
+
+	public void setNotificationDeviceGroup(Map<String, String> notificationDeviceGroup) {
+		this.notificationDeviceGroup = notificationDeviceGroup;
 	}
 
 	public void setEmail(String email) {
@@ -146,4 +163,12 @@ public class User {
 	public void setId(ObjectId id) {
 		this.id = id;
 	}
+	
+	public void setUserNotificationKey(String userNotificationKey) {
+        this.notificationDeviceGroup.replace("notification_key", userNotificationKey);
+    }
+	
+	public void setUserNotificationKeyName(String userNotificationKeyName) {
+        this.notificationDeviceGroup.replace("notification_key_name", userNotificationKeyName);
+    }
 }

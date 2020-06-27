@@ -1,17 +1,16 @@
 package com.shopper.shopperapi.resources.controller;
 
-import com.shopper.shopperapi.models.Pago;
+import com.shopper.shopperapi.models.OrderShopper;
 import com.shopper.shopperapi.services.FCMService;
 import com.shopper.shopperapi.services.OrderService;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,6 +20,7 @@ public class OrderController {
 
     @Autowired
     private OrderService orderService;
+    
     @Autowired
     private FCMService fcmService;
 
@@ -35,4 +35,5 @@ public class OrderController {
                 "Hola, Jadir",
                 "Tu pedido ha llegado");
     }
+
 }

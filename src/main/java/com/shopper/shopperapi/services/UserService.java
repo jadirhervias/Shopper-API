@@ -83,4 +83,23 @@ public class UserService {
     public void delete(User user) {
         this.userRepository.delete(user);
     }
+    
+    public String getUserNotificationKeyName(String id) {
+        User user = userRepository.findById(id).get();
+//        return user.getUserNotificationKeyName();
+        assert user.getNotificationDeviceGroup() != null;
+        return user.getNotificationDeviceGroup().get("notification_key_name");
+    }
+    
+    public String getUserNotificationKey(String id) {
+        User user = userRepository.findById(id).get();
+//        return user.getUserNotificationKey();
+        assert user.getNotificationDeviceGroup() != null;
+        return user.getNotificationDeviceGroup().get("notification_key");
+    }
+    
+    public String getUserFirstName(String id) {
+        User user = userRepository.findById(id).get();
+        return user.getFirstName();
+    }
 }

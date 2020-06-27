@@ -64,7 +64,7 @@ public class Order {
 	private Integer totalProduc;
 	
 	@NotNull
-	private Pago pago;
+	private Charge pago;
 
 	public ObjectId getId() {
 		return id;
@@ -138,11 +138,11 @@ public class Order {
 		this.totalProduc = totalProduc;
 	}
 
-	public Pago getPago() {
+	public Charge getPago() {
 		return pago;
 	}
 
-	public void setPago(Pago pago) {
+	public void setPago(Charge pago) {
 		this.pago = pago;
 	}
 	

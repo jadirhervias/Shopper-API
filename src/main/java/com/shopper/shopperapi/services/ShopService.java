@@ -61,71 +61,41 @@ public class ShopService {
 //        return this.catalogRepository.getProducts(id);
 //    }
 
-    /**
-     * Método para crear catálogo
-     * @param shop
-     * @return Catalog
-     */
+
     @Transactional
     public Shop create(Shop shop) {
 //        shop.setId(ObjectId.get());
         return this.shopRepository.save(shop);
     }
 
-    /**
-     * Método para actualizar catálogo
-     * @param id
-     * @param shop
-     */
     @Transactional
     public void update(ObjectId id, Shop shop) {
         shop.setId(id);
         this.shopRepository.save(shop);
     }
-
-    /**
-     * Método para eliminar catálogo
-     * @param shop
-     */
     @Transactional
     public void delete(Shop shop) {
         this.shopRepository.delete(shop);
     }
 
     public List<ResponseShopsOrder> getNearestShopsForUser(Double userLat, Double userLng, String id){
-
         List<ResponseShopsOrder> orderedShops = new ArrayList<ResponseShopsOrder>();
-
-            // Ordenar tiendas por distancia al usuario
     		if(id == null) {
-
             	List<Shop> shops = shopRepository.findAll();
                 for (Shop shop : shops) {
                     double distance = DistanceCalculated.distanceCoord(
-                            userLat, userLng, shop.getShopLat(), shop.getShopLng()
-                    );
+                            userLat, userLng, shop.getShopLat(), shop.getShopLng());
                     shop.setCategories(null);
                     orderedShops.add(new ResponseShopsOrder(distance, shop));
                 }
-
-            // Mostrar distancia de la tienda al usuario
             } else {
-
             	Shop shop = shopRepository.findById(new ObjectId(id));
-//            	double distancia = distanceCalculated.distanceCoord(
-
-                /**
-                 * TODO: Validar si la tienda no se encuentra (Muestra ERROR 500!!!!)
-                 */
                 double distance = DistanceCalculated.distanceCoord(
                         userLat, userLng, shop.getShopLat(), shop.getShopLng()
                 );
-
             	shop.setCategories(null);
             	orderedShops.add(new ResponseShopsOrder(distance, shop));
-
             }
-
     		return orderedShops;
     }
 }

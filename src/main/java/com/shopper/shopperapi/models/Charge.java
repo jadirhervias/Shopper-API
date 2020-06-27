@@ -2,7 +2,7 @@ package com.shopper.shopperapi.models;
 
 import javax.validation.constraints.NotNull;
 
-public class Pago {
+public class Charge {
 	
 	@NotNull
 	private Integer amount;
