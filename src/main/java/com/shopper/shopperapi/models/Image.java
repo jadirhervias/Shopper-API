@@ -17,18 +17,4 @@ public class Image {
     public String getId() {
         return id.toHexString();
     }
-
-	public String getImage() {
-		return image;
-	}
-
-	public void setImage(String image) {
-		this.image = image;
-	}
-
-	public void setId(ObjectId id) {
-		this.id = id;
-	}
-    
-    
 }
