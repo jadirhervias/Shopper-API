@@ -1,10 +1,12 @@
 package com.shopper.shopperapi.models;
 
 import java.sql.Date;
-import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
+import com.google.cloud.firestore.annotation.PropertyName;
+import com.google.firebase.database.Exclude;
+import com.google.firebase.database.IgnoreExtraProperties;
 import lombok.Data;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Transient;
@@ -18,137 +20,88 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.mongodb.lang.Nullable;
 
 @Data
-@Document(collection = "purchases")
+@Document(collection = "orders")
+@IgnoreExtraProperties
 public class Order {
 
+//	@Nullable
 	@MongoId(FieldType.OBJECT_ID)
-	private ObjectId id;
+	private ObjectId id = ObjectId.get();
 	
 	@NotNull
-	@Field("id_user")
-	@DBRef(db = "users")
-	@JsonProperty("id_user")
-	private User userId;
-
-	@Transient
-	@JsonProperty("firebase_db_reference_key")
-	private String firebaseDbReferenceKey;
+	@DBRef
+	private User customer;
 	
 	@Nullable
-	@Field("id_shoper")
-	@DBRef(db = "users")
-	@JsonProperty("id_shoper")
-	private User shoperId;
+	@DBRef
+	private User shopper;
+
+	@NotNull
+	@Field("shop_id")
+	@JsonProperty("shop_id")
+	private String shopId;
+
+	@Transient
+	@Nullable
+	@JsonProperty("firebase_db_reference_key")
+	private String firebaseDbReferenceKey;
+
+	/**
+	 * TODO: CHECK IF IS OK
+	 */
+//	@Nullable
+	private Coordenates coordenates;
+	
+//	@NotNull
+	@Nullable
+	@DBRef
+	@Field("shopping_car")
+	@JsonProperty("shopping_car")
+	private ShoppingCar shoppingCar;
 	
 	@NotNull
-	@Field("compras")
-	@JsonProperty("products")
-	private List<ShoppingCar> shoppingCar;
-	
+	private int state = 0;
+	//	@Builder
+
 	@NotNull
-//	@Builder
-	private int estado = 0;
-	
-	@NotNull
-	@Field("fech_compra")
-//	@Builder
-	private Date fechCompra;
+	@Field("fecha_compra")
+	@JsonProperty("fecha_compra")
+	private Date fechaCompra;
+	//	@Builder
 //	= (@NotNull Date) new java.util.Date();
 	
 	@Nullable
-	@Field("fech_entrega")
-	@JsonProperty("fech_entrega")
-	private Date fechEntrega;
+	@Field("fecha_entrega")
+	@JsonProperty("fecha_entrega")
+	private Date fechaEntrega;
 	
 	@Nullable
-	@JsonProperty("descripcion")
-	private String descripcion;
+	private String description;
+
+	@Field("total_cost")
+	@JsonProperty("total_cost")
+	private int totalCost;
 	
-	@Nullable
-	@JsonProperty("count")
-	private Integer totalProduc;
-	
-	@NotNull
-	private Charge charge;
+//	@NotNull
+//	private Charge charge;
 
-	public ObjectId getId() {
-		return id;
+	@Field("source_id")
+	@JsonProperty("source_id")
+	private String sourceId;
+
+	public Order() {
 	}
 
-	public void setId(ObjectId id) {
-		this.id = id;
+	public String getId() {
+		return id.toHexString();
 	}
 
-	public User getUserId() {
-		return userId;
-	}
+//	public ObjectId getObjectId() {
+//		return id;
+//	}
 
-	public void setUserId(User userId) {
-		this.userId = userId;
+	public void setCoordenates(double userLat, double userLng) {
+		this.coordenates.setLatitude(userLat);
+		this.coordenates.setLongitude(userLng);
 	}
-
-	public User getShoperId() {
-		return shoperId;
-	}
-
-	public void setShoperId(User shoperId) {
-		this.shoperId = shoperId;
-	}
-
-	public List<ShoppingCar> getShoppingCar() {
-		return shoppingCar;
-	}
-
-	public void setShoppingCar(List<ShoppingCar> shoppingCar) {
-		this.shoppingCar = shoppingCar;
-	}
-
-	public int getEstado() {
-		return estado;
-	}
-
-	public void setEstado(int estado) {
-		this.estado = estado;
-	}
-
-	public Date getFechCompra() {
-		return fechCompra;
-	}
-
-	public void setFechCompra(Date fechCompra) {
-		this.fechCompra = fechCompra;
-	}
-
-	public Date getFechEntrega() {
-		return fechEntrega;
-	}
-
-	public void setFechEntrega(Date fechEntrega) {
-		this.fechEntrega = fechEntrega;
-	}
-
-	public String getDescripcion() {
-		return descripcion;
-	}
-
-	public void setDescripcion(String descripcion) {
-		this.descripcion = descripcion;
-	}
-
-	public Integer getTotalProduc() {
-		return totalProduc;
-	}
-
-	public void setTotalProduc(Integer totalProduc) {
-		this.totalProduc = totalProduc;
-	}
-
-	public Charge getCharge() {
-		return charge;
-	}
-
-	public void setCharge(Charge charge) {
-		this.charge = charge;
-	}
-
 }

@@ -33,6 +33,14 @@ public class UserService {
     }
 
     /**
+     * Método para listar por rol
+     * @return List<User>
+     */
+    public List<User> findByRole(String role) {
+        return this.userRepository.findByRole(role);
+    }
+
+    /**
      * Método para buscar usuario por id
      * @param id
      * @return User
@@ -47,8 +55,7 @@ public class UserService {
      * @return User
      */
     public Optional<User> findByEmail(String email) {
-        Optional<User> user = this.userRepository.findByEmail(email);
-        return user;
+        return this.userRepository.findByEmail(email);
     }
 
     /**
@@ -57,8 +64,7 @@ public class UserService {
      * @return String
      */
     public String getUserFirstName(String id) {
-        User user = userRepository.findById(id).get();
-        return user.getFirstName();
+        return userRepository.findById(id).get().getFirstName();
     }
 
     /**
@@ -68,7 +74,6 @@ public class UserService {
      */
     public String getUserNotificationKey(String id) {
         User user = userRepository.findById(id).get();
-//        return user.getUserNotificationKey();
         assert user.getNotificationDeviceGroup() != null;
         return user.getNotificationDeviceGroup().get("notification_key");
     }
@@ -80,7 +85,6 @@ public class UserService {
      */
     public String getUserNotificationKeyName(String id) {
         User user = userRepository.findById(id).get();
-//        return user.getUserNotificationKeyName();
         assert user.getNotificationDeviceGroup() != null;
         return user.getNotificationDeviceGroup().get("notification_key_name");
     }
@@ -108,11 +112,11 @@ public class UserService {
         this.userRepository.save(user);
     }
 
+
     /**
-     * Método para eliminar un usuario
+     * Método para eliminar un usuario usando directamente el objeto usuario
      * @param user
      */
-    // Usando directamente el objeto usuario
     @Transactional
     public void delete(User user) {
         this.userRepository.delete(user);

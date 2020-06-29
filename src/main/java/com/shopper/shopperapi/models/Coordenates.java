@@ -1,26 +1,18 @@
 package com.shopper.shopperapi.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.firebase.database.Exclude;
+import com.google.firebase.database.IgnoreExtraProperties;
 import lombok.Data;
 
 @Data
+@IgnoreExtraProperties
 public class Coordenates {
-    @JsonProperty("lng")
-    private double latitude;
     @JsonProperty("lat")
+    private double latitude;
+    @JsonProperty("lng")
     private double longitude;
-	public double getLatitude() {
-		return latitude;
+
+    public Coordenates() {
 	}
-	public void setLatitude(double latitude) {
-		this.latitude = latitude;
-	}
-	public double getLongitude() {
-		return longitude;
-	}
-	public void setLongitude(double longitude) {
-		this.longitude = longitude;
-	}
-    
-    
 }

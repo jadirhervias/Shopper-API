@@ -1,6 +1,9 @@
 package com.shopper.shopperapi.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.cloud.firestore.annotation.PropertyName;
+import com.google.firebase.database.Exclude;
+import com.google.firebase.database.IgnoreExtraProperties;
 import lombok.Data;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
@@ -12,6 +15,7 @@ import javax.validation.constraints.NotNull;
 
 @Data
 @Document(collection = "products")
+@IgnoreExtraProperties
 public class Product {
     @Id
     private ObjectId id = ObjectId.get();
@@ -28,83 +32,10 @@ public class Product {
     @JsonProperty("last_update")
     private String lastUpdate;
 
-    @Override
-    public String toString() {
-        return String.format(
-                "Product[name='%s']", name);
-    }
+	public Product() {
+	}
 
-    public String getId() {
+	public String getId() {
         return id.toHexString();
     }
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getDetails() {
-		return details;
-	}
-
-	public void setDetails(String details) {
-		this.details = details;
-	}
-
-	public double getCost() {
-		return cost;
-	}
-
-	public void setCost(double cost) {
-		this.cost = cost;
-	}
-
-	public String getFormat() {
-		return format;
-	}
-
-	public void setFormat(String format) {
-		this.format = format;
-	}
-
-	public String getBrand() {
-		return brand;
-	}
-
-	public void setBrand(String brand) {
-		this.brand = brand;
-	}
-
-	public int getStock() {
-		return stock;
-	}
-
-	public void setStock(int stock) {
-		this.stock = stock;
-	}
-
-	public Image getImage() {
-		return image;
-	}
-
-	public void setImage(Image image) {
-		this.image = image;
-	}
-
-	public String getLastUpdate() {
-		return lastUpdate;
-	}
-
-	public void setLastUpdate(String lastUpdate) {
-		this.lastUpdate = lastUpdate;
-	}
-
-	public void setId(ObjectId id) {
-		this.id = id;
-	}
-    
-    
 }

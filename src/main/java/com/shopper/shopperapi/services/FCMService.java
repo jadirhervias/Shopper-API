@@ -1,6 +1,7 @@
 package com.shopper.shopperapi.services;
 
 import com.shopper.shopperapi.models.FirebaseNotification;
+import com.shopper.shopperapi.models.Order;
 import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -19,52 +20,66 @@ public class FCMService {
     private RestTemplate restTemplate;
 
     // Notificar a todos los SHOPPERS más cercanos cuando un usuario CUSTOMER realizó una orden
-    public void sendPushNotificationToShoppers(String senderDeviceFcmKey, List<?> receiverDeviceFcmKeys, String messageTitle, String messageBody) {
+    public void sendPushNotificationToShoppers(String senderDeviceFcmKey, List<?> receiverDeviceFcmKeys,
+                                               String messageTitle, String messageBody, Order order) {
         FirebaseNotification firebaseNotification = new FirebaseNotification();
         firebaseNotification.setTitle(messageTitle);
         firebaseNotification.setBody(messageBody);
         firebaseNotification.setNotificationType("Test");
 
-        JSONObject msg = new JSONObject();
-        msg.put("title", firebaseNotification.getTitle());
-        msg.put("body", firebaseNotification.getBody());
-        msg.put("notificationType", firebaseNotification.getNotificationType());
+        JSONObject notificationMsg = new JSONObject();
+        notificationMsg.put("title", firebaseNotification.getTitle());
+        notificationMsg.put("body", firebaseNotification.getBody());
+        notificationMsg.put("notificationType", firebaseNotification.getNotificationType());
+
+        JSONObject dataMessage = new JSONObject();
+        dataMessage.put("title", firebaseNotification.getTitle());
+        dataMessage.put("body", firebaseNotification.getBody());
+        dataMessage.put("notificationType", firebaseNotification.getNotificationType());
+        dataMessage.put("order", order);
 
         receiverDeviceFcmKeys.forEach(key -> {
             System.out.println("\nCalling fcm Server >>>>>>>");
-            String response = callToFcmServer(msg, key.toString(), senderDeviceFcmKey);
+            String response = callToFcmServer(notificationMsg, dataMessage, key.toString(), senderDeviceFcmKey);
             System.out.println("Got response from fcm Server : " + response + "\n\n");
         });
     }
 
     // Notificar al usuario CUSTOMER cuando su pedido haya llegado
-    public void sendPushNotificationToCustomer(String receiverDeviceFcmKey, String senderDeviceFcmKey, String messageTitle, String messageBody) {
+    public void sendPushNotificationToCustomer(String receiverDeviceFcmKey, String senderDeviceFcmKey,
+                                               String messageTitle, String messageBody, Order order) {
         FirebaseNotification firebaseNotification = new FirebaseNotification();
         firebaseNotification.setTitle(messageTitle);
         firebaseNotification.setBody(messageBody);
         firebaseNotification.setNotificationType("Test");
 
-        JSONObject msg = new JSONObject();
-        msg.put("title", firebaseNotification.getTitle());
-        msg.put("body", firebaseNotification.getBody());
-        msg.put("notificationType", firebaseNotification.getNotificationType());
+        JSONObject notificationMsg = new JSONObject();
+        notificationMsg.put("title", firebaseNotification.getTitle());
+        notificationMsg.put("body", firebaseNotification.getBody());
+        notificationMsg.put("notificationType", firebaseNotification.getNotificationType());
+
+        JSONObject dataMessage = new JSONObject();
+        dataMessage.put("title", firebaseNotification.getTitle());
+        dataMessage.put("body", firebaseNotification.getBody());
+        dataMessage.put("notificationType", firebaseNotification.getNotificationType());
+        dataMessage.put("order", order);
 
         System.out.println("\nCalling fcm Server >>>>>>>");
-        String response = callToFcmServer(msg, receiverDeviceFcmKey, senderDeviceFcmKey);
+        String response = callToFcmServer(notificationMsg, dataMessage, receiverDeviceFcmKey, senderDeviceFcmKey);
         System.out.println("Got response from fcm Server : " + response + "\n\n");
         System.out.println(">>>> CHECK THE CUSTOMER UI!!!!!");
     }
 
     // Request a FCM Server
-    private String callToFcmServer(JSONObject message, String receiverDeviceFcmKey, String senderDeviceFcmKey) {
+    private String callToFcmServer(JSONObject notificationMessage, JSONObject dataMessage, String receiverDeviceFcmKey, String senderDeviceFcmKey) {
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.set("Authorization", "key=" + FIREBASE_SERVER_KEY);
         httpHeaders.set("Content-Type", "application/json");
 
         JSONObject json = new JSONObject();
-        json.put("data", message);
-        json.put("notification", message);
+        json.put("data", dataMessage);
+        json.put("notification", notificationMessage);
         json.put("to", receiverDeviceFcmKey);
         json.put("from", senderDeviceFcmKey);
         System.out.println("Sending :" + json.toString());
