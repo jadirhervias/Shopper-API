@@ -53,18 +53,18 @@ public class CategoryService {
      */
     @Transactional
     public Category create(Category category) {
-        category.setId(ObjectId.get());
+        category.setId(ObjectId.get().toHexString());
         return this.categoryRepository.save(category);
     }
 
     /**
      * Método para actualizar categoría
-     * @param id
+     * @param oid
      * @param category
      */
     @Transactional
-    public void update(ObjectId id, Category category) {
-        category.setId(id);
+    public void update(ObjectId oid, Category category) {
+        category.setId(oid.toHexString());
         this.categoryRepository.save(category);
     }
 

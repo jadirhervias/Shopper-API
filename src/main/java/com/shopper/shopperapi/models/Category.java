@@ -4,17 +4,13 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.*;
 
 @Data
 @Document(collection = "categories")
 public class Category {
-    @Id
-    private ObjectId id;
+	@MongoId(FieldType.OBJECT_ID)
+	private String id;
     private String name;
     @Field("sub_categories")
     @JsonProperty("sub_categories")
@@ -25,30 +21,4 @@ public class Category {
     public String toString() {
         return String.format("Category[name='%s']", name);
     }
-
-    public String getId() {
-        return id.toHexString();
-    }
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public List<SubCategory> getSubCategories() {
-		return subCategories;
-	}
-
-	public void setSubCategories(List<SubCategory> subCategories) {
-		this.subCategories = subCategories;
-	}
-
-	public void setId(ObjectId id) {
-		this.id = id;
-	}
-    
-    
 }

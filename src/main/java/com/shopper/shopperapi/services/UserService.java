@@ -8,7 +8,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -52,6 +54,14 @@ public class UserService {
     }
 
     /**
+     * Método para listar por rol
+     * @return List<User>
+     */
+    public List<User> findByRole(String role) {
+        return this.userRepository.findByRole(role);
+    }
+
+    /**
      * Método para obtener el nombre del usuario
      * @param id
      * @return String
@@ -74,6 +84,23 @@ public class UserService {
     }
 
     /**
+     * Método para actualizar notification key por ID del usuario
+     * @param userId-
+     * @param notificationKeyName-
+     * @param newNotificationKey-
+     */
+    public void setUserNotificationKey(String userId, String notificationKeyName, String newNotificationKey) {
+
+        User user = this.findById(new ObjectId(userId)).get();
+        Map<String, String> newUserNotificationDeviceGroup = new HashMap<>();
+
+        newUserNotificationDeviceGroup.put("notification_key_name", notificationKeyName);
+        newUserNotificationDeviceGroup.put("notification_key", newNotificationKey);
+
+        user.setNotificationDeviceGroup(newUserNotificationDeviceGroup);
+    }
+
+    /**
      * Método para buscar notification key name por ID del usuario
      * @param id
      * @return String
@@ -92,7 +119,7 @@ public class UserService {
      */
     @Transactional
     public User create(User user) {
-        user.setId(ObjectId.get());
+        user.setId(ObjectId.get().toHexString());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return this.userRepository.save(user);
     }
@@ -104,7 +131,7 @@ public class UserService {
      */
     @Transactional
     public void update(ObjectId id, User user) {
-        user.setId(id);
+        user.setId(id.toHexString());
         this.userRepository.save(user);
     }
 

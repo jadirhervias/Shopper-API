@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-import org.bson.types.ObjectId;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.*;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -17,7 +16,7 @@ import javax.validation.constraints.NotNull;
 public class Shop {
 
     @MongoId(FieldType.OBJECT_ID)
-    private ObjectId id;
+    private String id;
     private String name;
     @NotNull
     @Field("last_update")
@@ -38,16 +37,4 @@ public class Shop {
     @Field("shop_lng")
     @JsonProperty("shop_lng")
     private double shopLng;
-
-    public String getId() {
-        return id.toHexString();
-    }
-
-//    @Override
-//    public String toString() {
-//        return String.format(
-//                "Shop[id=%s, lastUpdate='%s']",
-//                id, lastUpdate
-//        );
-//    }
 }

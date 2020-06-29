@@ -2,22 +2,24 @@ package com.shopper.shopperapi.models;
 
 import javax.validation.constraints.NotNull;
 
+import com.google.firebase.database.IgnoreExtraProperties;
 import lombok.Data;
-import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.FieldType;
+import org.springframework.data.mongodb.core.mapping.MongoId;
 
 import java.util.List;
+import java.util.Objects;
 
 @Data
 @Document(collection = "shopping_cars")
+@IgnoreExtraProperties
 public class ShoppingCar {
 
-	@Id
-	private ObjectId id = ObjectId.get();
+	@MongoId(FieldType.OBJECT_ID)
+	private String id;
 
 	@NotNull
 	@DBRef
@@ -29,8 +31,22 @@ public class ShoppingCar {
 	public ShoppingCar() {
 	}
 
-	public String getId() {
-		return id.toHexString();
+	@Override
+	public String toString() {
+		return "ShoppingCar{" +
+				"id=" + id +
+				", products=" + products +
+				", count=" + count +
+				'}';
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof ShoppingCar)) return false;
+		ShoppingCar that = (ShoppingCar) o;
+		return getCount() == that.getCount() &&
+				Objects.equals(getId(), that.getId()) &&
+				Objects.equals(getProducts(), that.getProducts());
+	}
 }

@@ -8,6 +8,9 @@ public class OrderShopper {
     @NotNull
     private double distance;
     @NotNull
+    /**
+     * TODO: CHANGE THIS
+     */
     private String notification_key;
 
     public OrderShopper(@NotNull double distance, @NotNull String notification_key) {

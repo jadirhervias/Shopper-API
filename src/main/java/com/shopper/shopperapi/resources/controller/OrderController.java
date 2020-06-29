@@ -1,10 +1,7 @@
 package com.shopper.shopperapi.resources.controller;
 
-import com.shopper.shopperapi.models.Charge;
 import com.shopper.shopperapi.models.Order;
-import com.shopper.shopperapi.services.FCMService;
 import com.shopper.shopperapi.services.OrderService;
-import com.shopper.shopperapi.services.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONException;
@@ -15,7 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import static com.shopper.shopperapi.utils.notification.NotificationMessages.*;
+import static com.shopper.shopperapi.utils.notification.OrderState.*;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,40 +27,64 @@ public class OrderController {
 
     @Autowired
     private OrderService orderService;
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private FCMService fcmService;
 
-    @PostMapping("/{customerId}")
+    @PostMapping
     @PreAuthorize("hasAuthority('orders:write')")
-    public ResponseEntity<?> createOrder(@PathVariable("customerId") String customerId, @RequestBody @Valid Order order)
+    public ResponseEntity<?> createOrder(@RequestBody @Valid Order order)
             throws JSONException {
-        Charge charge = new Charge();
 
-        String customerDeviceGroupKey = userService.getUserNotificationKey(customerId);
+        try {
+            boolean success = orderService.processOrder(order);
+            if (!success) {
+                return new ResponseEntity<>(null, HttpStatus.PRECONDITION_FAILED);
+            }
 
-//        orderService.newOrder(customerDeviceGroupKey, order);
-        orderService.processOrder(order, charge, customerDeviceGroupKey);
-
+            return new ResponseEntity<>(null, HttpStatus.CREATED);
+        } catch (IllegalArgumentException e) {
+            System.out.println("EX: " + e);
+            e.getCause();
+//            System.out.println(e.getCause());
+        }
         return new ResponseEntity<>(null, HttpStatus.CREATED);
     }
 
-    @PostMapping("/arrived/{shopperId}/{customerId}")
+    @PostMapping("/take/{shopperId}/{orderFirebaseDbRefKey}")
     @PreAuthorize("hasRole('ROLE_SHOPPER')")
-    public void sendNotificationToCustomer(
+    public ResponseEntity<?> takeOrder(
             @PathVariable("shopperId") String shopperId,
-            @PathVariable("customerId") String customerId
-    ) {
+            @PathVariable("orderFirebaseDbRefKey") String orderFirebaseDbRefKey) {
+        orderService.handleOrder(orderFirebaseDbRefKey, ORDER_TAKEN_STATE.getState(), shopperId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
-        String userName = userService.getUserFirstName(customerId);
-        String userDeviceGroupKey = userService.getUserNotificationKey(customerId);
-        String senderKey = userService.getUserNotificationKey(shopperId);
+    /**
+     * TODO: IGNORE ORDER FEATURE - SHOPPER USER
+     */
 
-        fcmService.sendPushNotificationToCustomer(
-                userDeviceGroupKey,
-                senderKey,
-                MESSAGE_TITLE.getMessage() + userName,
-                ORDER_ARRIVED_MESSAGE_BODY.getMessage());
+    @PostMapping("/arrived/{shopperId}/{orderFirebaseDbRefKey}")
+    @PreAuthorize("hasRole('ROLE_SHOPPER')")
+    public ResponseEntity<?> orderArrived(
+            @PathVariable("shopperId") String shopperId,
+            @PathVariable("orderFirebaseDbRefKey") String orderFirebaseDbRefKey) {
+        orderService.handleOrder(orderFirebaseDbRefKey, ORDER_ARRIVED_STATE.getState(), shopperId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/ok/{shopperId}/{orderFirebaseDbRefKey}")
+    @PreAuthorize("hasRole('ROLE_SHOPPER')")
+    public ResponseEntity<?> completeOrder(
+            @PathVariable("shopperId") String shopperId,
+            @PathVariable("orderFirebaseDbRefKey") String orderFirebaseDbRefKey) {
+        orderService.handleOrder(orderFirebaseDbRefKey, ORDER_COMPLETED_STATE.getState(), shopperId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping("/cancel/{shopperId}/{orderFirebaseDbRefKey}")
+    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
+    public ResponseEntity<?> cancelOrder(
+            @PathVariable("shopperId") String shopperId,
+            @PathVariable("orderFirebaseDbRefKey") String orderFirebaseDbRefKey) {
+        orderService.handleOrder(orderFirebaseDbRefKey, ORDER_CANCELLED_STATE.getState(), shopperId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

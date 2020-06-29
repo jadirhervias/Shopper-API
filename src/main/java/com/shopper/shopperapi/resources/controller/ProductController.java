@@ -84,7 +84,7 @@ public class ProductController {
             @RequestPart(value = "image") MultipartFile file,
             @RequestPart(value = "product") @Valid Product product) throws IOException {
         Image image = imageService.addImage(file);
-        ObjectId newProductId = ObjectId.get();
+        String newProductId = ObjectId.get().toHexString();
         product.setId(newProductId);
         product.setImage(image);
         Product newProduct = this.productService.create(product);

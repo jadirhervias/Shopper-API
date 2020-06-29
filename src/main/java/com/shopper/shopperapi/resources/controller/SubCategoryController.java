@@ -80,7 +80,7 @@ public class SubCategoryController {
             @ApiResponse(code = 400, message = "Solicitud Inválida")
     })
     public ResponseEntity<SubCategory> createSubCategory(@Valid @RequestBody SubCategory subCategory) {
-        subCategory.setId(ObjectId.get());
+        subCategory.setId(ObjectId.get().toHexString());
         SubCategory newSubCategory = this.subCategoryService.create(subCategory);
         return new ResponseEntity<>(newSubCategory, HttpStatus.CREATED);
     }
