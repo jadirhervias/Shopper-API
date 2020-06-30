@@ -30,7 +30,7 @@ public class ImageService {
 
     public Image addImage(MultipartFile file) throws IOException {
         Image image = new Image();
-        image.setId(ObjectId.get());
+        image.setId(ObjectId.get().toHexString());
         System.out.println("BEFORE COMPRESSING: " + file.getBytes().length);
 //        Binary imageBinData = new Binary(BsonBinarySubType.BINARY, file.getBytes());
 //        byte[] compressedImage = compressBytes(file.getBytes());

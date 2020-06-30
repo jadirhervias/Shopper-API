@@ -80,7 +80,7 @@ public class CategoryController {
         @ApiResponse(code = 400, message = "Solicitud Inválida")
     })
     public ResponseEntity<Category> createCategory(@Valid @RequestBody Category category) {
-        category.setId(ObjectId.get());
+        category.setId(ObjectId.get().toHexString());
         Category newCategory = this.categoryService.create(category);
         return new ResponseEntity<>(newCategory, HttpStatus.CREATED);
     }

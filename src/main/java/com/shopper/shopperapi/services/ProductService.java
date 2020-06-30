@@ -69,7 +69,7 @@ public class ProductService {
      */
     @Transactional
     public Product create(Product product) {
-        product.setId(ObjectId.get());
+        product.setId(ObjectId.get().toHexString());
         return this.productRepository.save(product);
     }
 
@@ -80,7 +80,7 @@ public class ProductService {
      */
     @Transactional
     public void update(ObjectId id, Product product) {
-        product.setId(id);
+        product.setId(id.toHexString());
         this.productRepository.save(product);
     }
 

@@ -66,18 +66,21 @@ public class SubCategoryService {
      */
     @Transactional
     public SubCategory create(SubCategory subCategory) {
-        subCategory.setId(ObjectId.get());
+        subCategory.setId(ObjectId.get().toHexString());
         return this.subCategoryRepository.save(subCategory);
     }
 
     /**
      * Método para actualizar categoría
-     * @param id
+     * @param oid
      * @param category
      */
     @Transactional
-    public void update(ObjectId id, SubCategory category) {
-        category.setId(id);
+    /**
+     * TODO: CHANGE SERVICES LIKE THIS TO TAKE STRING AS THE PARAM
+     */
+    public void update(ObjectId oid, SubCategory category) {
+        category.setId(oid.toHexString());
         this.subCategoryRepository.save(category);
     }
 

@@ -68,7 +68,7 @@ public class UserController {
         @ApiResponse(code = 400, message = "Solicitud Inválida")
     })
     public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
-        user.setId(ObjectId.get());
+        user.setId(ObjectId.get().toHexString());
         User newUser = this.userService.create(user);
         return new ResponseEntity<>(newUser, HttpStatus.CREATED);
     }
@@ -80,7 +80,7 @@ public class UserController {
             @ApiResponse(code = 400, message = "Solicitud Inválida")
     })
     public ResponseEntity<User> register(@Valid @RequestBody User user) {
-        user.setId(ObjectId.get());
+        user.setId(ObjectId.get().toHexString());
         User newUser = this.userService.create(user);
         return new ResponseEntity<>(newUser, HttpStatus.CREATED);
     }

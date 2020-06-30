@@ -22,6 +22,11 @@ public class FCMService {
     // Notificar a todos los SHOPPERS más cercanos cuando un usuario CUSTOMER realizó una orden
     public void sendPushNotificationToShoppers(String senderDeviceFcmKey, List<?> receiverDeviceFcmKeys,
                                                String messageTitle, String messageBody, Order order) {
+
+        System.out.println("SEND PUSH NOTIFICATION TO THIS SHOPPERS: ");
+        System.out.println("#: " + receiverDeviceFcmKeys.size());
+        System.out.println("SHOPPERS: " + receiverDeviceFcmKeys);
+
         FirebaseNotification firebaseNotification = new FirebaseNotification();
         firebaseNotification.setTitle(messageTitle);
         firebaseNotification.setBody(messageBody);
@@ -40,7 +45,7 @@ public class FCMService {
 
         receiverDeviceFcmKeys.forEach(key -> {
             System.out.println("\nCalling fcm Server >>>>>>>");
-            String response = callToFcmServer(notificationMsg, dataMessage, key.toString(), senderDeviceFcmKey);
+            String response = callToFcmServer(notificationMsg, dataMessage, (String) key, senderDeviceFcmKey);
             System.out.println("Got response from fcm Server : " + response + "\n\n");
         });
     }

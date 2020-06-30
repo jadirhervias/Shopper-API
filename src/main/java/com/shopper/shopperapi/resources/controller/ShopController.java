@@ -117,7 +117,7 @@ public class ShopController {
         @ApiResponse(code = 400, message = "Solicitud Inválida")
     })
     public ResponseEntity<Shop> createShop(@Valid @RequestBody Shop shop) {
-        shop.setId(ObjectId.get());
+        shop.setId(ObjectId.get().toHexString());
         Shop newShop = this.shopService.create(shop);
         return new ResponseEntity<>(newShop, HttpStatus.CREATED);
     }

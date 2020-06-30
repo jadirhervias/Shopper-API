@@ -1,10 +1,7 @@
 package com.shopper.shopperapi.resources.controller;
 
-//import com.shopper.shopperapi.models.Charge;
 import com.shopper.shopperapi.models.Order;
-//import com.shopper.shopperapi.services.FCMService;
 import com.shopper.shopperapi.services.OrderService;
-//import com.shopper.shopperapi.services.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONException;
@@ -14,6 +11,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import static com.shopper.shopperapi.utils.notification.OrderState.*;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,25 +31,24 @@ public class OrderController {
 
     @Autowired
     private OrderService orderService;
-//    @Autowired
-//    private UserService userService;
-//    @Autowired
-//    private FCMService fcmService;
 
-//    @PostMapping("/{customerId}")
     @PostMapping
     @PreAuthorize("hasAuthority('orders:write')")
-    public ResponseEntity<?> createOrder(
-//            @PathVariable("customerId") String customerId,
-            @RequestBody Order order)
+    public ResponseEntity<?> createOrder(@RequestBody @Valid Order order)
             throws JSONException {
 
-        boolean success = orderService.processOrder(order);
+        try {
+            boolean success = orderService.processOrder(order);
+            if (!success) {
+                return new ResponseEntity<>(null, HttpStatus.PRECONDITION_FAILED);
+            }
 
-        if (!success) {
-            return new ResponseEntity<>(null, HttpStatus.PRECONDITION_FAILED);
+            return new ResponseEntity<>(null, HttpStatus.CREATED);
+        } catch (IllegalArgumentException e) {
+            System.out.println("EX: " + e);
+            e.getCause();
+//            System.out.println(e.getCause());
         }
-
         return new ResponseEntity<>(null, HttpStatus.CREATED);
     }
 
@@ -59,12 +57,15 @@ public class OrderController {
     public ResponseEntity<?> takeOrder(
             @PathVariable("shopperId") String shopperId,
             @PathVariable("orderFirebaseDbRefKey") String orderFirebaseDbRefKey) {
+        /**
+         * TODO: HANDLE ERROR USING BOOLEAN RESULT OF THIS FUNCTION:
+         */
         orderService.handleOrder(orderFirebaseDbRefKey, ORDER_TAKEN_STATE.getState(), shopperId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     /**
-     * TODO: IGNORE ORDER FEATURE - SHOPPER USER
+     * TODO: FEATURE TO IGNORE ORDER FOR THE SHOPPER USER
      */
 
     @PostMapping("/arrived/{shopperId}/{orderFirebaseDbRefKey}")
@@ -93,22 +94,4 @@ public class OrderController {
         orderService.handleOrder(orderFirebaseDbRefKey, ORDER_CANCELLED_STATE.getState(), shopperId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
-//    @PostMapping("/arrived/{shopperId}/{customerId}")
-//    @PreAuthorize("hasRole('ROLE_SHOPPER')")
-//    public void sendNotificationToCustomer(
-//            @PathVariable("shopperId") String shopperId,
-//            @PathVariable("customerId") String customerId
-//    ) {
-//
-//        String userName = userService.getUserFirstName(customerId);
-//        String userDeviceGroupKey = userService.getUserNotificationKey(customerId);
-//        String senderKey = userService.getUserNotificationKey(shopperId);
-//
-//        fcmService.sendPushNotificationToCustomer(
-//                userDeviceGroupKey,
-//                senderKey,
-//                MESSAGE_TITLE.getMessage() + userName,
-//                ORDER_ARRIVED_MESSAGE_BODY.getMessage());
-//    }
 }

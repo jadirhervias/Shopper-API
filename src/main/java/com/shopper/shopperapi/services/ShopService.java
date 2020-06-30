@@ -74,12 +74,12 @@ public class ShopService {
 
     /**
      * Método para actualizar tienda
-     * @param id
+     * @param oid
      * @param shop
      */
     @Transactional
-    public void update(ObjectId id, Shop shop) {
-        shop.setId(id);
+    public void update(ObjectId oid, Shop shop) {
+        shop.setId(oid.toHexString());
         this.shopRepository.save(shop);
     }
 

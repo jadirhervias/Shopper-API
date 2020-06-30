@@ -11,12 +11,15 @@ public class Charge {
 	private Integer amount;
 	@NotNull
 	@JsonProperty("currency_code")
-	private String currencyCode;
+	private String currency_code;
 	@NotNull
 	private String description;
 	@NotNull
 	private String email;
 	@NotNull
 	@JsonProperty("source_id")
-	private String sourceId;
+	/**
+	 * TODO: CHANGE THIS
+	 */
+	private String source_id;
 }

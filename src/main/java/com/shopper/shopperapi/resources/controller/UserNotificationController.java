@@ -48,9 +48,7 @@ public class UserNotificationController {
 
         // New Instande of userNotificationGroup
         UserNotificationDeviceGroup userNotificationDeviceGroup = new UserNotificationDeviceGroup();
-        userNotificationDeviceGroup.setNotificationKeyName(deviceGroup.getUserId());
-        userNotificationDeviceGroup.setRegistrationIds(deviceGroup.getRegistrationIds());
-
+        userNotificationDeviceGroup.setNotificationKeyName("appUser-" + deviceGroup.getUserId());
         userNotificationDeviceGroup.setNotificationKey(notificationKey);
 
         // notification_device_group field in user document
@@ -62,7 +60,7 @@ public class UserNotificationController {
         user.setNotificationDeviceGroup(deviceGroupKeys);
         userService.update(new ObjectId(deviceGroup.getUserId()), user);
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(userNotificationDeviceGroup, HttpStatus.OK);
     }
 
     @PostMapping(value = "/{userId}/add")
@@ -79,10 +77,7 @@ public class UserNotificationController {
                 notificationKeyName, registrationIds.get("registration_ids"), notificationKey);
 
         // ------------------- notificationKey cambia INICIO??
-        ObjectId userOid = new ObjectId(userId);
-        User user = userService.findById(userOid).get();
-
-        user.setUserNotificationKey(newNotificationKey);
+        userService.setUserNotificationKey(userId, notificationKeyName, newNotificationKey);
         // ------------------- notificationKey cambia FIN??
 
         return new ResponseEntity<>(HttpStatus.OK);
@@ -91,21 +86,18 @@ public class UserNotificationController {
     @PostMapping("/{userId}/remove")
     @PreAuthorize("hasAuthority('users:write')")
     public ResponseEntity<?> removeUserDeviceGroup(
-            @PathVariable("userId") String id,
+            @PathVariable("userId") String userId,
             @RequestBody Map<String, List<?>> registrationIds
     ) throws JSONException {
 
-        String notificationKeyName = userService.getUserNotificationKeyName(id);
-        String notificationKey = userService.getUserNotificationKey(id);
+        String notificationKeyName = userService.getUserNotificationKeyName(userId);
+        String notificationKey = userService.getUserNotificationKey(userId);
 
         String newNotificationKey = userNotificationService.removeNotificationKey(
                 notificationKeyName, registrationIds.get("registration_ids"), notificationKey);
 
         // ------------------- notificationKey cambia INICIO??
-        ObjectId userOid = new ObjectId(id);
-        User user = userService.findById(userOid).get();
-
-        user.setUserNotificationKey(newNotificationKey);
+        userService.setUserNotificationKey(userId, notificationKeyName, newNotificationKey);
         // ------------------- notificationKey cambia FIN??
 
         return new ResponseEntity<>(HttpStatus.OK);

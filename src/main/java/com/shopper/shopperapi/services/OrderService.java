@@ -5,20 +5,18 @@ import java.util.*;
 import com.google.firebase.database.*;
 import com.shopper.shopperapi.models.*;
 import com.shopper.shopperapi.utils.distance.DistanceCalculated;
-import com.shopper.shopperapi.utils.notification.OrderState;
 import org.bson.types.ObjectId;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 
 import com.shopper.shopperapi.repositories.OrderRepository;
 
-import com.shopper.shopperapi.utils.FirebaseConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.shopper.shopperapi.utils.notification.NotificationMessages.*;
-import static com.shopper.shopperapi.utils.notification.OrderState.*;
+import static com.shopper.shopperapi.utils.notification.OrderState.PENDING_ORDER_STATE;
+import static com.shopper.shopperapi.utils.notification.OrderState.isOrderTakenState;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -37,19 +35,10 @@ public class OrderService {
 	private ShopService shopService;
 	@Autowired
 	private DatabaseReference databaseReference;
-//	@Autowired
-//	private FCMService fcmService;
-//	@Autowired
-//	private FirebaseConfiguration firebaseConfiguration;
-//	@Autowired
-//	private ChildEventListener orderAddChildEventListener;
 	@Autowired
 	private RestTemplate restTemplate;
 
-	private final String django = "http://54.200.195.251/api/pagos/";
-
-	public OrderService() {
-	}
+	private final String DJANGO_API = "http://54.200.195.251/api/pagos/";
 
 	/**
 	 * TODO: Funcionalidad para ubicar al shopper(S) más cercano al customer
@@ -76,25 +65,19 @@ public class OrderService {
 	}
 
 	// Process order charge
-	public boolean processOrder(Order order
-//								, Charge charge, String customerNotificationKey, String orderFirebaseDbRefKey
-	) throws JSONException {
-
+	public boolean processOrder(Order order) throws JSONException {
 		User customer = order.getCustomer();
 
+		System.out.println("SHOP IDDDDDDDDD: " + order.getShopId());
+		System.out.println(">>>>>>>>> ORDER TO PROCESS: " + order);
+		System.out.println(">>>>>>>>> CUSTOMER IN STRING: " + order.toString());
 		System.out.println(">>>>>>>>> CUSTOMER OF THE ORDER: " + customer.toString());
 
 		boolean cardVerified = cardOperation(order.getSourceId(), customer.getId(), customer.getEmail(), order.getTotalCost());
-		if (cardVerified) {
-			// Obtener lista de notification keys de shopper más cercano(s)
-//			List<String> shoppersDeviceGroupKeys = shoperList(order.getShopId());
-//			"APA91bHhj2mg_MVQHPouK7WwkUb9xlhd52q4kQS9-OGKKBC1eo3L1A3UWb1MbH-ELXKf8Z3nslRfC-l-cGHp6bxEynD8k19axMEmL5c0BVK_elF-l3jyAzvvEl6-BCYQjOfBG-t4LXqDzgO_vED6t3qQCvuC9fbwvw"
 
+		if (cardVerified) {
 			// Call to firebase database - publicar la orden y notificar a shoppera más cercanos
-			newOrder( order
-//					, customerNotificationKey
-//					, shoppersDeviceGroupKeys
-			);
+			newOrder(order);
 
 			return true;
 
@@ -115,10 +98,7 @@ public class OrderService {
 	}
 
 	// Expose order in Firebase cloud
-	public void newOrder(
-			Order order
-//			String customerNotificationKey, List<String> shoppersDeviceGroupKey
-	) {
+	public void newOrder(Order order) {
 
 		DatabaseReference ordersRef = databaseReference.child("orders");
 
@@ -145,24 +125,21 @@ public class OrderService {
 				System.out.println("Order data saved successfully.");
 
 				// ...
-
-//				List<String> shoppersDeviceGroupKeys = shoperList(order.getShopId());
-//				fcmService.sendPushNotificationToShoppers(customerNotificationKey, shoppersDeviceGroupKeys ,
-//						MESSAGE_TITLE.getMessage(), NEW_ORDER_MESSAGE_BODY.getMessage(), orderFirebaseDbRefKey);
 			}
 		});
-
-		// ordersRef.child(orderId).setValueAsync(order);
 	}
 
-	// En función del request del shopper o customer
 	public void updateOrderByState(String orderFirebaseDbRefKey, int state, @Nullable String idShopper) {
+
 		DatabaseReference ordersRef = databaseReference.child("orders");
+
+		System.out.println("SE ACTUALIZARA EL ESTADO DE LA ORDEN : " + orderFirebaseDbRefKey);
+		System.out.println("QUE SHOPPER TOMÓ LA ORDEN: " + idShopper);
 
 		Map<String, Object> newOrderState = new HashMap<>();
 
 		if (isOrderTakenState(state) && idShopper != null) {
-			newOrderState.put("shopper", userService.findById(new ObjectId(idShopper)));
+			newOrderState.put("shopper", userService.findById(new ObjectId(idShopper)).get());
 		}
 
 		newOrderState.put("state", state);
@@ -193,7 +170,7 @@ public class OrderService {
 
 		HttpEntity<String> httpEntity = new HttpEntity<>(param.toString());
 
-		ResponseEntity<String> 	msm = restTemplate.exchange(django, HttpMethod.POST, httpEntity, String.class);
+		ResponseEntity<String> 	msm = restTemplate.exchange(DJANGO_API, HttpMethod.POST, httpEntity, String.class);
 
 		if (msm.getBody().equals("201")) {
 			success = true;
@@ -206,15 +183,15 @@ public class OrderService {
 
 	/**
 	 * Método para obtener lista de SHOPPERS más cercanos al pedido en orden de distancia
-	 * @param id_shop-
+	 * @param idShop-
 	 * @return List<String>
 	 */
-	public List<String> shoperList(String id_shop) {
+	public List<String> shoperList(String idShop) {
 
 		List<User> usuario = userService.findByRole("ROLE_SHOPPER");
 		List<OrderShopper> orderShopper = new ArrayList<>();
 		List<String> notification_key = new ArrayList<>();
-		Shop shop = shopService.findById(new ObjectId(id_shop));
+		Shop shop = shopService.findById(new ObjectId(idShop));
 
 		for (User user : usuario) {
 			Double distancia = DistanceCalculated.distanceCoord(user.getUserLat(), user.getUserLng(), shop.getShopLat(), shop.getShopLng());
