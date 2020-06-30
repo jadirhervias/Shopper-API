@@ -53,12 +53,15 @@ public class OrderController {
     public ResponseEntity<?> takeOrder(
             @PathVariable("shopperId") String shopperId,
             @PathVariable("orderFirebaseDbRefKey") String orderFirebaseDbRefKey) {
+        /**
+         * TODO: HANDLE ERROR USING BOOLEAN RESULT OF THIS FUNCTION:
+         */
         orderService.handleOrder(orderFirebaseDbRefKey, ORDER_TAKEN_STATE.getState(), shopperId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     /**
-     * TODO: IGNORE ORDER FEATURE - SHOPPER USER
+     * TODO: FEATURE TO IGNORE ORDER FOR THE SHOPPER USER
      */
 
     @PostMapping("/arrived/{shopperId}/{orderFirebaseDbRefKey}")

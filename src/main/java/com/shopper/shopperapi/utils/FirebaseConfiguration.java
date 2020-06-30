@@ -16,11 +16,10 @@ import org.springframework.context.annotation.Configuration;
 import javax.annotation.PostConstruct;
 import java.io.InputStream;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static com.shopper.shopperapi.utils.notification.NotificationMessages.*;
+import static com.shopper.shopperapi.utils.notification.OrderState.*;
 
 @Configuration
 public class FirebaseConfiguration {
@@ -73,54 +72,42 @@ public class FirebaseConfiguration {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String prevChildKey) {
 
+                    /**
+                     * TODO: LOG HERE
+                     */
                     System.out.println("EVENT");
-
-                    System.out.println("HAS CHILD: " + dataSnapshot.hasChild(dataSnapshot.getKey()));
-                    System.out.println(dataSnapshot);
-
-//                    System.out.println("DESCRIPTION: " + dataSnapshot.child("value").child());
-
-                    System.out.println("generic type: " + dataSnapshot.getValue());
-
                     System.out.println("CASTING MODEL TEST: " + dataSnapshot.getValue(Order.class));
-
-//                    Object orderMap = dataSnapshot.getValue();
-//                    orderMap.
-
                     System.out.println("Previous Order ID: " + prevChildKey);
 
-//                    Map<String, Object> orderMap = new HashMap<>();
-//                    orderMap.put(dataSnapshot.getKey(), dataSnapshot.getValue(true));
-//
-//                    System.out.println("ORDER MAP: " + orderMap);
-
-//                    Order newOrder = new Order();
-//                    Order newOrder = (Order) dataSnapshot.getValue();
-
-                    System.out.println("OBJ CAN BE ORDER INSTANCE?: " + Order.class.equals(dataSnapshot.getValue()));
                     Order newOrder = dataSnapshot.getValue(Order.class);
 
                     System.out.println("ID order: " + newOrder.getId());
-
                     String customerId = newOrder.getCustomer().getId();
+
                     System.out.println("ID customer: " + customerId);
                     System.out.println("CUSTOMER EMAIL: " + newOrder.getCustomer().getEmail());
                     System.out.println("CUSTOMER FIRST NAME: " + newOrder.getCustomer().getFirstName());
+                    System.out.println("ORDER SHOP ID: " + newOrder.getShopId());
 
                     if (newOrder.getShopper() != null) {
                         System.out.println("ID shopper: " + newOrder.getShopper().getId());
                     }
 
-                    List<String> shoppersDeviceGroupKeys = orderService.shoperList(newOrder.getShopId());
+                    if (isOrderPendingState(newOrder.getState())) {
+                        List<String> shoppersDeviceGroupKeys = orderService.shoperList(newOrder.getShopId());
+                        System.out.println("A QUE SHOPPERS LES LLEGARA LA NOTIFICAION: " + shoppersDeviceGroupKeys);
 
-                    fcmService.sendPushNotificationToShoppers(userService.getUserNotificationKey(customerId),
-                            shoppersDeviceGroupKeys, MESSAGE_TITLE.getMessage(),
-                            NEW_ORDER_MESSAGE_BODY.getMessage(), newOrder);
-//                newOrder.getFirebaseDbReferenceKey()
+                        fcmService.sendPushNotificationToShoppers(userService.getUserNotificationKey(customerId),
+                                shoppersDeviceGroupKeys, MESSAGE_TITLE.getMessage(),
+                                NEW_ORDER_MESSAGE_BODY.getMessage(), newOrder);
+                    }
                 }
 
                 @Override
                 public void onChildChanged(DataSnapshot dataSnapshot, String prevChildKey) {
+                    /**
+                     * TODO: LOG HERE
+                     */
                     System.out.println("Order (state) changed");
                     Order changedOrder = dataSnapshot.getValue(Order.class);
                     System.out.println("The Order ID is: " + changedOrder.getId());
@@ -128,12 +115,8 @@ public class FirebaseConfiguration {
                     int state = changedOrder.getState();
                     System.out.println("The Order state is: " + state);
 
-//                    String customerId = changedOrder.getCustomer().getId();
                     String customerId = changedOrder.getCustomer().getId();
-
-//                    String shopperId = changedOrder.getCustomer().getId();
                     String shopperId = changedOrder.getCustomer().getId();
-
 
                     switch (state) {
                         // Orden tomada
@@ -143,8 +126,6 @@ public class FirebaseConfiguration {
                                     userService.getUserNotificationKey(shopperId),
                                     MESSAGE_TITLE.getMessage() + userService.getUserFirstName(customerId),
                                     ORDER_TAKEN_MESSAGE_BODY.getMessage(), changedOrder);
-//                        changedOrder.getFirebaseDbReferenceKey()
-
                         // Orden llegó
                         case 2:
                             fcmService.sendPushNotificationToCustomer(
@@ -152,12 +133,9 @@ public class FirebaseConfiguration {
                                     userService.getUserNotificationKey(shopperId),
                                     MESSAGE_TITLE.getMessage() + userService.getUserFirstName(customerId),
                                     ORDER_ARRIVED_MESSAGE_BODY.getMessage(), changedOrder);
-//                        changedOrder.getFirebaseDbReferenceKey()
-
                         // Orden completada
                         case 3:
                             // ...
-
                         // Orden cancelada
                         case 4:
                             List<String> shoppersDeviceGroupKeys = Collections.singletonList(userService.getUserNotificationKey(shopperId));
@@ -168,8 +146,6 @@ public class FirebaseConfiguration {
                                             + userService.getUserFirstName(customerId)
                                             + " ha hecho un pedido",
                                     ORDER_ARRIVED_MESSAGE_BODY.getMessage(), changedOrder);
-//                        changedOrder.getFirebaseDbReferenceKey()
-
                     }
                 }
 
@@ -177,7 +153,7 @@ public class FirebaseConfiguration {
                 public void onChildRemoved(DataSnapshot dataSnapshot) {
                     System.out.println("An Order was removed");
                     Order removedOrder = dataSnapshot.getValue(Order.class);
-                    System.out.println("The Order ID " + removedOrder + " has been deleted");
+                    System.out.println("The Order ID " + removedOrder.getId() + " has been deleted");
                 }
 
                 @Override

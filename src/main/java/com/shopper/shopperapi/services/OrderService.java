@@ -73,8 +73,7 @@ public class OrderService {
 		System.out.println(">>>>>>>>> CUSTOMER IN STRING: " + order.toString());
 		System.out.println(">>>>>>>>> CUSTOMER OF THE ORDER: " + customer.toString());
 
-//		boolean cardVerified = cardOperation(order.getSourceId(), customer.getId(), customer.getEmail(), order.getTotalCost());
-		boolean cardVerified = true;
+		boolean cardVerified = cardOperation(order.getSourceId(), customer.getId(), customer.getEmail(), order.getTotalCost());
 
 		if (cardVerified) {
 			// Call to firebase database - publicar la orden y notificar a shoppera más cercanos
@@ -118,8 +117,6 @@ public class OrderService {
 
 		order.getCustomer().setPassword(null);
 
-//		ordersRef.child(orderFirebaseDbRefKey).setValueAsync(order);
-
 		ordersRef.child(orderFirebaseDbRefKey).setValue(order, (databaseError, databaseReference) -> {
 			if (databaseError != null) {
 				System.out.println("Data could not be saved " + databaseError.getMessage());
@@ -128,10 +125,6 @@ public class OrderService {
 				System.out.println("Order data saved successfully.");
 
 				// ...
-
-//				List<String> shoppersDeviceGroupKeys = shoperList(order.getShopId());
-//				fcmService.sendPushNotificationToShoppers(customerNotificationKey, shoppersDeviceGroupKeys ,
-//						MESSAGE_TITLE.getMessage(), NEW_ORDER_MESSAGE_BODY.getMessage(), orderFirebaseDbRefKey);
 			}
 		});
 	}
@@ -140,10 +133,13 @@ public class OrderService {
 
 		DatabaseReference ordersRef = databaseReference.child("orders");
 
+		System.out.println("SE ACTUALIZARA EL ESTADO DE LA ORDEN : " + orderFirebaseDbRefKey);
+		System.out.println("QUE SHOPPER TOMÓ LA ORDEN: " + idShopper);
+
 		Map<String, Object> newOrderState = new HashMap<>();
 
 		if (isOrderTakenState(state) && idShopper != null) {
-			newOrderState.put("shopper", userService.findById(new ObjectId(idShopper)));
+			newOrderState.put("shopper", userService.findById(new ObjectId(idShopper)).get());
 		}
 
 		newOrderState.put("state", state);

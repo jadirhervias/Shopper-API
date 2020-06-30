@@ -1,5 +1,6 @@
 package com.shopper.shopperapi.models;
 
+import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 
 import com.google.firebase.database.IgnoreExtraProperties;
@@ -18,6 +19,7 @@ import java.util.Objects;
 @IgnoreExtraProperties
 public class ShoppingCar {
 
+	@Nullable
 	@MongoId(FieldType.OBJECT_ID)
 	private String id;
 

@@ -16,6 +16,4 @@ public class UserNotificationDeviceGroup {
     private String notificationKey;
     @JsonProperty("notification_key_name")
     private String notificationKeyName;
-    @JsonProperty("registration_ids")
-    private List<String> registrationIds;
 }

@@ -48,9 +48,7 @@ public class UserNotificationController {
 
         // New Instande of userNotificationGroup
         UserNotificationDeviceGroup userNotificationDeviceGroup = new UserNotificationDeviceGroup();
-        userNotificationDeviceGroup.setNotificationKeyName(deviceGroup.getUserId());
-        userNotificationDeviceGroup.setRegistrationIds(deviceGroup.getRegistrationIds());
-
+        userNotificationDeviceGroup.setNotificationKeyName("appUser-" + deviceGroup.getUserId());
         userNotificationDeviceGroup.setNotificationKey(notificationKey);
 
         // notification_device_group field in user document
@@ -62,7 +60,7 @@ public class UserNotificationController {
         user.setNotificationDeviceGroup(deviceGroupKeys);
         userService.update(new ObjectId(deviceGroup.getUserId()), user);
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(userNotificationDeviceGroup, HttpStatus.OK);
     }
 
     @PostMapping(value = "/{userId}/add")
