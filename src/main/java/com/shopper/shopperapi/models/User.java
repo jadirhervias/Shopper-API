@@ -22,7 +22,6 @@ import java.util.Objects;
 @Document(collection = "users")
 @IgnoreExtraProperties
 @TypeAlias("user")
-@IgnoreExtraProperties
 public class User {
     // Valid hex string
     @MongoId(FieldType.OBJECT_ID)

@@ -61,14 +61,6 @@ public class UserService {
     }
 
     /**
-     * Método para listar por rol
-     * @return List<User>
-     */
-    public List<User> findByRole(String role) {
-        return this.userRepository.findByRole(role);
-    }
-
-    /**
      * Método para obtener el nombre del usuario
      * @param id
      * @return String
@@ -138,7 +130,6 @@ public class UserService {
         user.setId(id.toHexString());
         this.userRepository.save(user);
     }
-
 
     /**
      * Método para eliminar un usuario usando directamente el objeto usuario

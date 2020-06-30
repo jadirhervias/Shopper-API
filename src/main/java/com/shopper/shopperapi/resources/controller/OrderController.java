@@ -18,10 +18,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import static com.shopper.shopperapi.utils.notification.NotificationMessages.*;
-import static com.shopper.shopperapi.utils.notification.OrderState.*;
-
-
 import javax.validation.Valid;
 
 @RestController
