@@ -64,15 +64,21 @@ public class Order {
 	@Nullable
 	@Field("fecha_compra")
 	@JsonProperty("fecha_compra")
-	private Date fechaCompra;
+	private String fechaCompra;
 
 	@Nullable
 	@Field("fecha_entrega")
 	@JsonProperty("fecha_entrega")
-	private Date fechaEntrega;
+	private String fechaEntrega;
 	
 	@Nullable
 	private String description;
+
+	@JsonProperty("count")
+	private int totalProducts;
+
+	@Nullable
+	private Charge charge;
 
 	@Field("total_cost")
 	@JsonProperty("total_cost")
@@ -88,14 +94,8 @@ public class Order {
 	// CUSTOM GETTERS
 	@Nullable
 	@Exclude
-	public Date getFechaCompra() {
-		return fechaCompra;
-	}
-
-	@Nullable
-	@Exclude
-	public Date getFechaEntrega() {
-		return fechaEntrega;
+	public Charge getCharge() {
+		return charge;
 	}
 
 	@Override

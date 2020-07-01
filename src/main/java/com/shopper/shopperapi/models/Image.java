@@ -6,6 +6,11 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+
+import static com.shopper.shopperapi.services.ImageService.decompressBytes;
+
 @Data
 @Document(collection = "images")
 public class Image {
@@ -13,4 +18,9 @@ public class Image {
     private String id;
     @Field("source")
     private String image;
+
+    public String getImage() {
+        byte[] decodedImage = Base64.getDecoder().decode(image.getBytes(StandardCharsets.UTF_8));
+        return Base64.getEncoder().encodeToString(decompressBytes(decodedImage));
+    }
 }

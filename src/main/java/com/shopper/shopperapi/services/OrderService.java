@@ -3,12 +3,15 @@ package com.shopper.shopperapi.services;
 import java.util.*;
 
 import com.google.firebase.database.*;
-import com.shopper.shopperapi.models.*;
 import com.shopper.shopperapi.utils.distance.DistanceCalculated;
 import org.bson.types.ObjectId;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 
+import com.shopper.shopperapi.models.Order;
+import com.shopper.shopperapi.models.OrderShopper;
+import com.shopper.shopperapi.models.Shop;
+import com.shopper.shopperapi.models.User;
 import com.shopper.shopperapi.repositories.OrderRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +40,6 @@ public class OrderService {
 	private DatabaseReference databaseReference;
 	@Autowired
 	private RestTemplate restTemplate;
-
 	private final String DJANGO_API = "http://54.200.195.251/api/pagos/";
 
 	/**
@@ -68,23 +70,26 @@ public class OrderService {
 	public boolean processOrder(Order order) throws JSONException {
 		User customer = order.getCustomer();
 
-		System.out.println("SHOP IDDDDDDDDD: " + order.getShopId());
-		System.out.println(">>>>>>>>> ORDER TO PROCESS: " + order);
-		System.out.println(">>>>>>>>> CUSTOMER IN STRING: " + order.toString());
-		System.out.println(">>>>>>>>> CUSTOMER OF THE ORDER: " + customer.toString());
+		System.out.println(order.getSourceId());
+		System.out.println(customer.getId());
+		System.out.println(customer.getEmail());
+		System.out.println(order.getTotalCost());
 
-		boolean cardVerified = cardOperation(order.getSourceId(), customer.getId(), customer.getEmail(), order.getTotalCost());
+		if (order.getTotalCost() >= 300) {
+			boolean cardVerified = cardOperation(order.getSourceId(), customer.getId(), customer.getEmail(), order.getTotalCost());
 
-		if (cardVerified) {
-			// Call to firebase database - publicar la orden y notificar a shoppera más cercanos
-			newOrder(order);
-
-			return true;
-
-		} else {
-			System.out.println("card problem");
-			return false;
+			if (cardVerified) {
+				// Call to firebase database - publicar la orden y notificar a shoppera más cercanos
+				newOrder(order);
+				return true;
+			} else {
+				System.out.println("card problem");
+				return false;
+			}
 		}
+
+		System.out.println("Order not valid (not enough amount)");
+		return false;
 	}
 
 	public boolean handleOrder(String orderFirebaseDbRefKey, int state, String shopperId) {

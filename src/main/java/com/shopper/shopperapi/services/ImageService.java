@@ -3,6 +3,8 @@ package com.shopper.shopperapi.services;
 import com.shopper.shopperapi.models.Image;
 import com.shopper.shopperapi.repositories.ImageRepository;
 import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
+import org.bson.BsonBinarySubType;
+import org.bson.types.Binary;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,8 +25,12 @@ public class ImageService {
     public Image getImageById(String id) {
         Image image = imageRepository.findById(id).get();
         byte[] decodedImage = Base64.getDecoder().decode(image.getImage().getBytes(StandardCharsets.UTF_8));
-//        String decompressedImage = Base64.getEncoder().encodeToString(decompressBytes(decodedImage));
-        image.setImage(Base64.getEncoder().encodeToString(decodedImage));
+        String decompressedImage = Base64.getEncoder().encodeToString(decompressBytes(decodedImage));
+
+        image.setImage(Base64.getEncoder().encodeToString(decompressedImage.getBytes()));
+
+//        image.setImage(Base64.getEncoder().encodeToString(decodedImage));
+
         return image;
     }
 
@@ -32,9 +38,14 @@ public class ImageService {
         Image image = new Image();
         image.setId(ObjectId.get().toHexString());
         System.out.println("BEFORE COMPRESSING: " + file.getBytes().length);
+
 //        Binary imageBinData = new Binary(BsonBinarySubType.BINARY, file.getBytes());
-//        byte[] compressedImage = compressBytes(file.getBytes());
-        image.setImage(Base64.getEncoder().encodeToString(file.getBytes()));
+
+        byte[] compressedImage = compressBytes(file.getBytes());
+        image.setImage(Base64.getEncoder().encodeToString(compressedImage));
+
+        //        image.setImage(Base64.getEncoder().encodeToString(file.getBytes()));
+
         image = imageRepository.save(image);
         return image;
 //        return image.getId();

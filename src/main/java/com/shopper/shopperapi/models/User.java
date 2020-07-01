@@ -13,9 +13,10 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
+import java.util.Map;
+
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
-import java.util.Map;
 import java.util.Objects;
 
 @Data

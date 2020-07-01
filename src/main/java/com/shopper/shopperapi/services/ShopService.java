@@ -17,7 +17,6 @@ import java.util.List;
 public class ShopService {
 
     private final ShopRepository shopRepository;
-//    private DistanceCalculated distanceCalculated;
 
     public ShopService(ShopRepository shopRepository) {
         this.shopRepository = shopRepository;
@@ -36,9 +35,6 @@ public class ShopService {
      * @param id
      * @return Shop
      */
-//    public Catalog findById(String id) {
-//        return this.catalogRepository.findById(id);
-//    }
     public Shop findById(ObjectId id) {
         return this.shopRepository.findById(id);
     }
@@ -93,39 +89,23 @@ public class ShopService {
     }
 
     public List<ResponseShopsOrder> getNearestShopsForUser(Double userLat, Double userLng, String id){
-
         List<ResponseShopsOrder> orderedShops = new ArrayList<ResponseShopsOrder>();
-
-            // Ordenar tiendas por distancia al usuario
     		if(id == null) {
-
             	List<Shop> shops = shopRepository.findAll();
                 for (Shop shop : shops) {
                     double distance = DistanceCalculated.distanceCoord(
-                            userLat, userLng, shop.getShopLat(), shop.getShopLng()
-                    );
+                            userLat, userLng, shop.getShopLat(), shop.getShopLng());
                     shop.setCategories(null);
                     orderedShops.add(new ResponseShopsOrder(distance, shop));
                 }
-
-            // Mostrar distancia de la tienda al usuario
             } else {
-
             	Shop shop = shopRepository.findById(new ObjectId(id));
-//            	double distancia = distanceCalculated.distanceCoord(
-
-                /**
-                 * TODO: Validar si la tienda no se encuentra (Muestra ERROR 500!!!!)
-                 */
                 double distance = DistanceCalculated.distanceCoord(
                         userLat, userLng, shop.getShopLat(), shop.getShopLng()
                 );
-
             	shop.setCategories(null);
             	orderedShops.add(new ResponseShopsOrder(distance, shop));
-
             }
-
     		return orderedShops;
     }
 }
