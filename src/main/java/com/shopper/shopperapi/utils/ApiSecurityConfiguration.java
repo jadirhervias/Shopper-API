@@ -1,6 +1,7 @@
 package com.shopper.shopperapi.utils;
 
 import com.shopper.shopperapi.auth.ApplicationUserService;
+import com.shopper.shopperapi.services.UserService;
 import com.shopper.shopperapi.utils.apiKeyToken.ApiKeyTokenVerifier;
 import com.shopper.shopperapi.utils.jwt.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,7 @@ public class ApiSecurityConfiguration extends WebSecurityConfigurerAdapter {
     private final ApplicationUserService applicationUserService;
     private final SecretKey secretKey;
     private final JwtConfig jwtConfig;
+    private final UserService userService;
     private final ApiKeyTokenVerifier apiKeyTokenVerifier;
 
     @Autowired
@@ -37,12 +39,14 @@ public class ApiSecurityConfiguration extends WebSecurityConfigurerAdapter {
                                     ApplicationUserService applicationUserService,
                                     SecretKey secretKey,
                                     JwtConfig jwtConfig,
-                                    ApiKeyTokenVerifier apiKeyTokenVerifier) {
+                                    ApiKeyTokenVerifier apiKeyTokenVerifier,
+                                    UserService userService) {
         this.passwordEncoder = passwordEncoder;
         this.applicationUserService = applicationUserService;
         this.secretKey = secretKey;
         this.jwtConfig = jwtConfig;
         this.apiKeyTokenVerifier = apiKeyTokenVerifier;
+        this.userService = userService;
     }
 
     // Authorization
@@ -64,7 +68,7 @@ public class ApiSecurityConfiguration extends WebSecurityConfigurerAdapter {
             .httpBasic()
 //                .authenticationEntryPoint()
             .and()
-            .addFilterAfter(new JwtUsernameAndPasswordAuthenticationFilter(apiKeyTokenVerifier, jwtConfig, secretKey), BasicAuthenticationFilter.class)
+            .addFilterAfter(new JwtUsernameAndPasswordAuthenticationFilter(apiKeyTokenVerifier, jwtConfig, secretKey,userService), BasicAuthenticationFilter.class)
             .addFilterAfter(new JwtTokenVerifier(secretKey, jwtConfig), JwtUsernameAndPasswordAuthenticationFilter.class);
     }
 
