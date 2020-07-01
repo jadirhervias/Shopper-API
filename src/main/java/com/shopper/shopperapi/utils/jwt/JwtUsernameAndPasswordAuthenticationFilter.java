@@ -1,11 +1,12 @@
 package com.shopper.shopperapi.utils.jwt;
 
+import com.shopper.shopperapi.models.User;
+import com.shopper.shopperapi.services.UserService;
 import com.shopper.shopperapi.utils.apiKeyToken.ApiKeyTokenRequest;
 import com.shopper.shopperapi.utils.apiKeyToken.ApiKeyTokenVerifier;
 
 import io.jsonwebtoken.Jwts;
 import net.minidev.json.JSONObject;
-
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,47 +22,39 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Optional;
 
 public class JwtUsernameAndPasswordAuthenticationFilter extends GenericFilterBean {
-
     private final JwtConfig jwtConfig;
     private final SecretKey secretKey;
     private final ApiKeyTokenVerifier apiKeyTokenVerifier;
+    private final UserService userService;
     private final JSONObject userJson = new JSONObject();
 
     public JwtUsernameAndPasswordAuthenticationFilter(
             ApiKeyTokenVerifier apiKeyTokenVerifier,
             JwtConfig jwtConfig,
-            SecretKey secretKey
+            SecretKey secretKey,
+            UserService userService
     ) {
         super();
         this.apiKeyTokenVerifier = apiKeyTokenVerifier;
         this.jwtConfig = jwtConfig;
         this.secretKey = secretKey;
+        this.userService = userService;
+        
     }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
-
+    	
         HttpServletRequest httpRequest = (HttpServletRequest) request;
-//            response.reset();
         response.setContentType("application/json");
-
-        // Requiere acceso al método POST
-//            apiKeyTokenRequest.setApiKeyToken(Arrays.toString(request.getParameterMap().get("api_key_token")));
-
-
-        // PARA EVITAR QUE PIDA API_KEY_TOKEN EN CADA REQUEST
 
         String header = httpRequest.getHeader("Authorization");
 
         if(header != null && !header.startsWith("Bearer ")) {
             if (!header.startsWith("Basic ")) {
-//                ApiResponse apiResponse = new ApiResponse(401, "Parametros Requeridos", false);
-//                OutputStream outputStream = response.getOutputStream();
-//                ObjectMapper mapper = new ObjectMapper();
-//                mapper.writeValue(outputStream, apiResponse);
-//                outputStream.flush();
 
                 HttpServletResponse httpResponse = (HttpServletResponse) response;
                 httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED,
@@ -73,28 +66,17 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends GenericFilterBea
                 boolean apiKeyTokenExists = false;
 
                 for (String key : headers) {
-                    System.out.println(key);
                     if (key.equals("api_key_token")) {
                         apiKeyTokenExists = true;
                         break;
                     }
                 }
-
-                System.out.println(">>>>>>>>>>> API KEY tokennnnn: " + apiKeyTokenExists);
                 if (!apiKeyTokenExists) {
-
-//                    ApiResponse apiResponse = new ApiResponse(401, "API KEY TOKEN REQUERIDO", false);
-//                    OutputStream outputStream = response.getOutputStream();
-//                    ObjectMapper mapper = new ObjectMapper();
-//                    mapper.writeValue(outputStream, apiResponse);
-//                    outputStream.flush();
-
                     HttpServletResponse httpResponse = (HttpServletResponse) response;
                     httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED,
                             "API key token requerido");
 
                 } else {
-                    System.out.println(">>>>>>>>>>> API KEY EXISTE");
 
                     if (!httpRequest.getHeader("api_key_token").isEmpty()) {
                         String apiKeyToken = httpRequest.getHeader("api_key_token");
@@ -103,8 +85,6 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends GenericFilterBea
                         boolean isValid = apiKeyTokenVerifier.verifyApiKeyToken(apiKeyTokenRequest.getApiKeyToken());
 
                         if (!isValid) {
-                            System.out.println(">>>>>>>>>>> API KEY INVALIDA");
-
                             HttpServletResponse httpResponse = (HttpServletResponse) response;
                             httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED,
                                     "Api key token is invalid or incorrect");
@@ -123,15 +103,22 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends GenericFilterBea
                                 .compact();
 
                         JSONObject json = new JSONObject();
-
-                        this.userJson.put("email", authResult.getName());
-
+                        userJson.put("email", authResult.getName());
+                        Optional<User> user = this.usuario(authResult.getName());
+                        userJson.put("id", user.get().getId());
+                        userJson.put("email", user.get().getEmail());
+                        userJson.put("first_name", user.get().getFirstName());
+                        userJson.put("last_name", user.get().getLastName());
+                        userJson.put("addres", user.get().getAddress());
+                        userJson.put("user_lat", user.get().getUserLat());
+                        userJson.put("user_lng", user.get().getUserLng());
+                        userJson.put("phone_number", user.get().getPhoneNumber());
+                        userJson.put("notification", user.get().getNotificationDeviceGroup());
                         json.put("token", token);
                         json.put("user", userJson);
 
                         try {
                             PrintWriter out = response.getWriter();
-                            //ServletOutputStream out = response.getOutputStream();
                             out.println(json.toString());
                             out.flush();
 
@@ -142,15 +129,14 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends GenericFilterBea
                     }
 
                 }
-//                else {
-//                    HttpServletResponse httpResponse = (HttpServletResponse) response;
-//                    httpResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED,
-//                            "Api key token is invalid or incorrect");
-//                }
             }
         } else {
             filterChain.doFilter(request, response);
         }
 
+    }
+    
+    public Optional<User> usuario(String email) {
+    	return this.userService.findByEmail(email);
     }
 }

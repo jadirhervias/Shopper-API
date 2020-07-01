@@ -16,10 +16,6 @@ import org.springframework.web.client.RestTemplate;
 @EnableConfigurationProperties({JwtConfig.class, ApiKeyTokenConfig.class})
 public class ShopperApiApplication {
 
-	// @Bean para que solo se cree una instancia de cierta clase a lo largo de la aplicación. Evita la sobrecarga de instancias
-	// Para usarlo, se inyecta el @Bean con @Autowired
-
-	// Clase para hacer peticiones a otras API's
 	@Bean
 	public RestTemplate getRestTemplate() {
 		return new RestTemplate();

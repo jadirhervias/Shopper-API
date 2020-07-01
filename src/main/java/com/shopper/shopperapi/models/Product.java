@@ -20,6 +20,10 @@ public class Product {
     private double cost;
     private String format;
     private String brand;
+    // Used when is in the shopping car
+    @Nullable
+    @com.mongodb.lang.Nullable
+    private Integer quantity;
     private int stock;
     @Nullable
     @DBRef
