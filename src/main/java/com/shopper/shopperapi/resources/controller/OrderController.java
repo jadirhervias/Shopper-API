@@ -29,11 +29,18 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
+    @PostMapping("/new")
+    @PreAuthorize("hasAuthority('orders:write')")
+    public ResponseEntity<?> newOrder(@RequestBody @Valid Order order) {
+        System.out.println(order);
+        orderService.create(order);
+        return new ResponseEntity<>(order, HttpStatus.CREATED);
+    }
+
     @PostMapping
     @PreAuthorize("hasAuthority('orders:write')")
     public ResponseEntity<?> createOrder(@RequestBody @Valid Order order)
             throws JSONException {
-
         try {
             boolean success = orderService.processOrder(order);
             if (!success) {

@@ -16,7 +16,9 @@ import org.springframework.context.annotation.Configuration;
 import javax.annotation.PostConstruct;
 import java.io.InputStream;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.shopper.shopperapi.utils.notification.NotificationMessages.*;
 import static com.shopper.shopperapi.utils.notification.OrderState.*;
@@ -124,6 +126,7 @@ public class FirebaseConfiguration {
                                     userService.getUserNotificationKey(shopperId),
                                     MESSAGE_TITLE.getMessage() + userService.getUserFirstName(customerId),
                                     ORDER_TAKEN_MESSAGE_BODY.getMessage(), changedOrder);
+                            break;
                         // Orden llegó
                         case 2:
                             fcmService.sendPushNotificationToCustomer(
@@ -131,19 +134,24 @@ public class FirebaseConfiguration {
                                     userService.getUserNotificationKey(shopperId),
                                     MESSAGE_TITLE.getMessage() + userService.getUserFirstName(customerId),
                                     ORDER_ARRIVED_MESSAGE_BODY.getMessage(), changedOrder);
-                        // Orden completada
+                            break;
+                        // Orden completada / recibida
                         case 3:
-                            // ...
+                            System.out.println(">>> CASE 3");
+                            System.out.println(">>> ORDER OBJ");
+                            System.out.println(changedOrder);
+                            orderService.deleteFirebaseOrder(changedOrder);
+                            break;
                         // Orden cancelada
                         case 4:
                             List<String> shoppersDeviceGroupKeys = Collections.singletonList(userService.getUserNotificationKey(shopperId));
-//                        shoppersDeviceGroupKeys.add(userService.getUserNotificationKey(shopperId));
                             fcmService.sendPushNotificationToShoppers(
                                     userService.getUserNotificationKey(customerId),
                                     shoppersDeviceGroupKeys, MESSAGE_TITLE.getMessage()
                                             + userService.getUserFirstName(customerId)
                                             + " ha hecho un pedido",
                                     ORDER_ARRIVED_MESSAGE_BODY.getMessage(), changedOrder);
+                            break;
                     }
                 }
 

@@ -2,6 +2,7 @@ package com.shopper.shopperapi.models;
 
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
 import lombok.Data;
@@ -28,33 +29,35 @@ public class Order {
 	private String id;
 
 	@NotNull
+//	@Transient
 	@DBRef
 	private User customer;
 
 	@Nullable
+//	@Transient
 	@DBRef
 	private User shopper;
 
 	@NotNull
 	@Field("shop_id")
 	@JsonProperty("shop_id")
+	@JsonAlias({"shop_id", "shopId"})
 	private String shopId;
 
 	@Transient
 	@Nullable
 	@JsonProperty("firebase_db_reference_key")
+	@JsonAlias({"firebase_db_reference_key", "firebaseDbReferenceKey"})
 	private String firebaseDbReferenceKey;
 
 	/**
 	 * TODO: CHECK IF IS OK
 	 */
-//	@Nullable
 	private Coordenates coordenates;
 
-	@Nullable
-	@DBRef
-	@Field("shopping_car")
+	@org.springframework.lang.Nullable
 	@JsonProperty("shopping_car")
+	@JsonAlias({"shopping_car", "shoppingCar"})
 	private ShoppingCar shoppingCar;
 	
 	@NotNull
@@ -64,28 +67,29 @@ public class Order {
 	@Nullable
 	@Field("fecha_compra")
 	@JsonProperty("fecha_compra")
+	@JsonAlias({"fecha_compra", "fechaCompra"})
 	private String fechaCompra;
 
 	@Nullable
 	@Field("fecha_entrega")
 	@JsonProperty("fecha_entrega")
+	@JsonAlias({"fecha_entrega", "fechaEntrega"})
 	private String fechaEntrega;
 	
 	@Nullable
 	private String description;
-
-	@JsonProperty("count")
-	private int totalProducts;
 
 	@Nullable
 	private Charge charge;
 
 	@Field("total_cost")
 	@JsonProperty("total_cost")
+	@JsonAlias({"total_cost", "totalCost"})
 	private int totalCost;
 
 	@Field("source_id")
 	@JsonProperty("source_id")
+	@JsonAlias({"source_id", "sourceId"})
 	private String sourceId;
 
 	public Order(){
