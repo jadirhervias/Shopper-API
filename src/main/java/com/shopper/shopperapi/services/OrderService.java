@@ -2,11 +2,7 @@ package com.shopper.shopperapi.services;
 
 import java.util.*;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.firebase.database.*;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
 import net.minidev.json.JSONObject;
 import com.shopper.shopperapi.utils.distance.DistanceCalculated;
 import org.bson.types.ObjectId;
