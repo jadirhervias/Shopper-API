@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -28,6 +29,14 @@ public class OrderController {
 
     @Autowired
     private OrderService orderService;
+
+    @GetMapping("/{customerId}")
+    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
+    public ResponseEntity<?> getOrders(
+            @PathVariable("customerId") String customerId) {
+        List<Order> orders = orderService.findOrdersByCustomerId(customerId);
+        return new ResponseEntity<>(orders, HttpStatus.OK);
+    }
 
     @PostMapping("/new")
     @PreAuthorize("hasAuthority('orders:write')")
