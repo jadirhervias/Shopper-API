@@ -32,9 +32,9 @@ public class DeviceGroup {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof DeviceGroup)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
         DeviceGroup that = (DeviceGroup) o;
-        return Objects.equals(getUserId(), that.getUserId()) &&
-                Objects.equals(getRegistrationIds(), that.getRegistrationIds());
+        return Objects.equals(userId, that.userId) &&
+                Objects.equals(registrationIds, that.registrationIds);
     }
 }

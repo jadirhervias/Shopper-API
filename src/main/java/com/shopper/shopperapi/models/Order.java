@@ -16,7 +16,6 @@ import org.springframework.data.mongodb.core.mapping.MongoId;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.mongodb.lang.Nullable;
 
-import java.util.Date;
 import java.util.Objects;
 
 @Data
@@ -124,19 +123,21 @@ public class Order {
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
-		if (!(o instanceof Order)) return false;
+		if (o == null || getClass() != o.getClass()) return false;
 		Order order = (Order) o;
-		return getState() == order.getState() &&
-				getTotalCost() == order.getTotalCost() &&
-				Objects.equals(getCustomer(), order.getCustomer()) &&
-				Objects.equals(getShopper(), order.getShopper()) &&
-				Objects.equals(getShopId(), order.getShopId()) &&
-				Objects.equals(getFirebaseDbReferenceKey(), order.getFirebaseDbReferenceKey()) &&
-				Objects.equals(getCoordenates(), order.getCoordenates()) &&
-				Objects.equals(getShoppingCar(), order.getShoppingCar()) &&
-				Objects.equals(getFechaCompra(), order.getFechaCompra()) &&
-				Objects.equals(getFechaEntrega(), order.getFechaEntrega()) &&
-				Objects.equals(getDescription(), order.getDescription()) &&
-				Objects.equals(getSourceId(), order.getSourceId());
+		return state == order.state &&
+				totalCost == order.totalCost &&
+				Objects.equals(id, order.id) &&
+				Objects.equals(customer, order.customer) &&
+				Objects.equals(shopper, order.shopper) &&
+				Objects.equals(shopId, order.shopId) &&
+				Objects.equals(firebaseDbReferenceKey, order.firebaseDbReferenceKey) &&
+				Objects.equals(coordenates, order.coordenates) &&
+				Objects.equals(shoppingCar, order.shoppingCar) &&
+				Objects.equals(fechaCompra, order.fechaCompra) &&
+				Objects.equals(fechaEntrega, order.fechaEntrega) &&
+				Objects.equals(description, order.description) &&
+				Objects.equals(charge, order.charge) &&
+				Objects.equals(sourceId, order.sourceId);
 	}
 }

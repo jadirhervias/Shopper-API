@@ -106,18 +106,18 @@ public class User {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof User)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return Double.compare(user.getUserLat(), getUserLat()) == 0 &&
-                Double.compare(user.getUserLng(), getUserLng()) == 0 &&
-                Objects.equals(getId(), user.getId()) &&
-                Objects.equals(getFirstName(), user.getFirstName()) &&
-                Objects.equals(getLastName(), user.getLastName()) &&
-                Objects.equals(getEmail(), user.getEmail()) &&
-                Objects.equals(getRole(), user.getRole()) &&
-                Objects.equals(getPassword(), user.getPassword()) &&
-                Objects.equals(getPhoneNumber(), user.getPhoneNumber()) &&
-                Objects.equals(getAddress(), user.getAddress()) &&
-                Objects.equals(getNotificationDeviceGroup(), user.getNotificationDeviceGroup());
+        return Double.compare(user.userLat, userLat) == 0 &&
+                Double.compare(user.userLng, userLng) == 0 &&
+                Objects.equals(id, user.id) &&
+                Objects.equals(firstName, user.firstName) &&
+                Objects.equals(lastName, user.lastName) &&
+                Objects.equals(email, user.email) &&
+                Objects.equals(role, user.role) &&
+                Objects.equals(password, user.password) &&
+                Objects.equals(phoneNumber, user.phoneNumber) &&
+                Objects.equals(address, user.address) &&
+                Objects.equals(notificationDeviceGroup, user.notificationDeviceGroup);
     }
 }

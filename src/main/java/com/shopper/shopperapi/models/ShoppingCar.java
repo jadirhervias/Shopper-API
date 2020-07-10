@@ -31,9 +31,9 @@ public class ShoppingCar {
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
-		if (!(o instanceof ShoppingCar)) return false;
+		if (o == null || getClass() != o.getClass()) return false;
 		ShoppingCar that = (ShoppingCar) o;
-		return getCount() == that.getCount() &&
-				Objects.equals(getProducts(), that.getProducts());
+		return count == that.count &&
+				Objects.equals(products, that.products);
 	}
 }

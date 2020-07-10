@@ -61,16 +61,17 @@ public class Product {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Product)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
         Product product = (Product) o;
-        return Double.compare(product.getCost(), getCost()) == 0 &&
-                getStock() == product.getStock() &&
-                Objects.equals(getId(), product.getId()) &&
-                Objects.equals(getName(), product.getName()) &&
-                Objects.equals(getDetails(), product.getDetails()) &&
-                Objects.equals(getFormat(), product.getFormat()) &&
-                Objects.equals(getBrand(), product.getBrand()) &&
-                Objects.equals(getImage(), product.getImage()) &&
-                Objects.equals(getLastUpdate(), product.getLastUpdate());
+        return Double.compare(product.cost, cost) == 0 &&
+                stock == product.stock &&
+                Objects.equals(id, product.id) &&
+                Objects.equals(name, product.name) &&
+                Objects.equals(details, product.details) &&
+                Objects.equals(format, product.format) &&
+                Objects.equals(brand, product.brand) &&
+                Objects.equals(quantity, product.quantity) &&
+                Objects.equals(image, product.image) &&
+                Objects.equals(lastUpdate, product.lastUpdate);
     }
 }

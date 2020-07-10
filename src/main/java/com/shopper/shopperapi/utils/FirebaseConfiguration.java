@@ -8,6 +8,8 @@ import com.shopper.shopperapi.models.*;
 import com.shopper.shopperapi.services.FCMService;
 import com.shopper.shopperapi.services.OrderService;
 import com.shopper.shopperapi.services.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -16,15 +18,15 @@ import org.springframework.context.annotation.Configuration;
 import javax.annotation.PostConstruct;
 import java.io.InputStream;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static com.shopper.shopperapi.utils.notification.NotificationMessages.*;
 import static com.shopper.shopperapi.utils.notification.OrderState.*;
 
 @Configuration
 public class FirebaseConfiguration {
+
+    private static final Logger logger = LoggerFactory.getLogger(FirebaseConfiguration.class);
 
     @Autowired
     private FCMService fcmService;
@@ -72,30 +74,27 @@ public class FirebaseConfiguration {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String prevChildKey) {
 
-                    /**
-                     * TODO: LOG HERE
-                     */
-                    System.out.println("EVENT");
-                    System.out.println("CASTING MODEL TEST: " + dataSnapshot.getValue(Order.class));
-                    System.out.println("Previous Order ID: " + prevChildKey);
+                    logger.info("event");
+                    logger.info("Order from Firebase: " + dataSnapshot.getValue(Order.class));
+                    logger.info("Previous Order ID: " + prevChildKey);
 
                     Order newOrder = dataSnapshot.getValue(Order.class);
 
-                    System.out.println("ID order: " + newOrder.getId());
+                    logger.info("ID order: " + newOrder.getId());
                     String customerId = newOrder.getCustomer().getId();
 
-                    System.out.println("ID customer: " + customerId);
-                    System.out.println("CUSTOMER EMAIL: " + newOrder.getCustomer().getEmail());
-                    System.out.println("CUSTOMER FIRST NAME: " + newOrder.getCustomer().getFirstName());
-                    System.out.println("ORDER SHOP ID: " + newOrder.getShopId());
+                    logger.info("ID customer: " + customerId);
+                    logger.info("CUSTOMER EMAIL: " + newOrder.getCustomer().getEmail());
+                    logger.info("CUSTOMER FIRST NAME: " + newOrder.getCustomer().getFirstName());
+                    logger.info("ORDER SHOP ID: " + newOrder.getShopId());
 
                     if (newOrder.getShopper() != null) {
-                        System.out.println("ID shopper: " + newOrder.getShopper().getId());
+                        logger.info("ID shopper: " + newOrder.getShopper().getId());
                     }
 
                     if (isOrderPendingState(newOrder.getState())) {
                         List<String> shoppersDeviceGroupKeys = orderService.shoperList(newOrder.getShopId());
-                        System.out.println("A QUE SHOPPERS LES LLEGARA LA NOTIFICAION: " + shoppersDeviceGroupKeys);
+                        logger.info("A QUE SHOPPERS LES LLEGARA LA NOTIFICAION: " + shoppersDeviceGroupKeys);
 
                         fcmService.sendPushNotificationToShoppers(userService.getUserNotificationKey(customerId),
                                 shoppersDeviceGroupKeys, MESSAGE_TITLE.getMessage(),
@@ -105,15 +104,13 @@ public class FirebaseConfiguration {
 
                 @Override
                 public void onChildChanged(DataSnapshot dataSnapshot, String prevChildKey) {
-                    /**
-                     * TODO: LOG HERE
-                     */
-                    System.out.println("Order (state) changed");
+
+                    logger.info("Order (state) changed");
                     Order changedOrder = dataSnapshot.getValue(Order.class);
-                    System.out.println("The Order ID is: " + changedOrder.getId());
+                    logger.info("The Order ID is: " + changedOrder.getId());
 
                     int state = changedOrder.getState();
-                    System.out.println("The Order state is: " + state);
+                    logger.info("The Order state is: " + state);
 
                     String customerId = changedOrder.getCustomer().getId();
                     String shopperId = changedOrder.getCustomer().getId();
@@ -137,9 +134,9 @@ public class FirebaseConfiguration {
                             break;
                         // Orden completada / recibida
                         case 3:
-                            System.out.println(">>> CASE 3");
-                            System.out.println(">>> ORDER OBJ");
-                            System.out.println(changedOrder);
+                            logger.info(">>> CASE 3");
+                            logger.info(">>> ORDER OBJ");
+                            logger.info("" + changedOrder);
                             orderService.deleteFirebaseOrder(changedOrder);
                             break;
                         // Orden cancelada
@@ -157,9 +154,9 @@ public class FirebaseConfiguration {
 
                 @Override
                 public void onChildRemoved(DataSnapshot dataSnapshot) {
-                    System.out.println("An Order was removed");
+                    logger.info("An Order was removed");
                     Order removedOrder = dataSnapshot.getValue(Order.class);
-                    System.out.println("The Order ID " + removedOrder.getId() + " has been deleted");
+                    logger.info("The Order ID " + removedOrder.getId() + " has been deleted");
                 }
 
                 @Override
@@ -167,12 +164,12 @@ public class FirebaseConfiguration {
 
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
-                    System.out.println("Error del order child event listener");
+                    logger.info("Error del order child event listener");
                 }
             });
 
         } catch (Exception e) {
-            System.out.println("Exception: " + e);
+            logger.warn("Exception: " + e);
             e.printStackTrace();
         }
     }

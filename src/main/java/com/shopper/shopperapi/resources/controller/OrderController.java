@@ -3,6 +3,8 @@ package com.shopper.shopperapi.resources.controller;
 import com.shopper.shopperapi.models.Order;
 import com.shopper.shopperapi.services.OrderService;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.hateoas.MediaTypes;
@@ -26,6 +28,8 @@ import javax.validation.Valid;
 @RequestMapping(value="/orders", produces = { MediaType.APPLICATION_JSON_VALUE, MediaTypes.COLLECTION_JSON_VALUE })
 public class OrderController {
 
+    private static final Logger logger = LoggerFactory.getLogger(OrderController.class);
+
     @Autowired
     private OrderService orderService;
 
@@ -47,13 +51,15 @@ public class OrderController {
                 return new ResponseEntity<>(null, HttpStatus.PRECONDITION_FAILED);
             }
 
-            return new ResponseEntity<>(null, HttpStatus.CREATED);
+            logger.info("Order in response" + order);
+            return new ResponseEntity<>(order, HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
             System.out.println("EX: " + e);
             e.getCause();
 //            System.out.println(e.getCause());
         }
-        return new ResponseEntity<>(null, HttpStatus.CREATED);
+        logger.info("Order in response" + order);
+        return new ResponseEntity<>(order, HttpStatus.CREATED);
     }
 
     @PostMapping("/take/{shopperId}/{orderFirebaseDbRefKey}")

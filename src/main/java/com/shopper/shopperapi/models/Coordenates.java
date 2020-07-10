@@ -26,9 +26,9 @@ public class Coordenates {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Coordenates)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
         Coordenates that = (Coordenates) o;
-        return Double.compare(that.getLatitude(), getLatitude()) == 0 &&
-                Double.compare(that.getLongitude(), getLongitude()) == 0;
+        return Double.compare(that.latitude, latitude) == 0 &&
+                Double.compare(that.longitude, longitude) == 0;
     }
 }
