@@ -3,15 +3,12 @@ package com.shopper.shopperapi.services;
 import java.util.*;
 
 import com.google.firebase.database.*;
+import com.shopper.shopperapi.models.*;
 import net.minidev.json.JSONObject;
 import com.shopper.shopperapi.utils.distance.DistanceCalculated;
 import org.bson.types.ObjectId;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 
-import com.shopper.shopperapi.models.Order;
-import com.shopper.shopperapi.models.OrderShopper;
-import com.shopper.shopperapi.models.Shop;
-import com.shopper.shopperapi.models.User;
 import com.shopper.shopperapi.repositories.OrderRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,10 +43,21 @@ public class OrderService {
 	 * TODO: Funcionalidad para ubicar al shopper(S) más cercano al customer
 	 */
 
-	// History of orders
-	public List<Order> finAll(){
+	// All completed/cancelled orders
+	public List<Order> findAll(){
 		return this.orderRepository.findAll();
 	}
+
+	// Completed/cancelled orders by customer id
+	public List<Order> findOrdersByCustomerId(String customerId){
+		return this.orderRepository.findByCustomerId(customerId);
+	}
+
+	// Pending orders by customer id
+//	public Order findPendingOrderByCustomerId(){
+//		DatabaseReference ordersRef = databaseReference.child("orders");
+//		ordersRef.
+//	}
 
 	/**
 	 * Método para crear una orden
@@ -205,9 +213,9 @@ public class OrderService {
 
 		HttpEntity<String> httpEntity = new HttpEntity<>(param.toString());
 
-		ResponseEntity<String> 	msm = restTemplate.exchange(DJANGO_API, HttpMethod.POST, httpEntity, String.class);
+		ResponseEntity<NewChargeResponse> charge = restTemplate.exchange(DJANGO_API, HttpMethod.POST, httpEntity, NewChargeResponse.class);
 
-		if (msm.getBody().equals("201")) {
+		if (charge.getBody() != null && charge.getBody().getStatus().equals("201")) {
 			success = true;
 		} else {
 			success = false;
