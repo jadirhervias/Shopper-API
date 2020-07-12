@@ -35,6 +35,8 @@ public class FirebaseConfiguration {
     @Autowired
     private OrderService orderService;
 
+    private Thread thread;
+
     // Clase para obtener instancia de Firebase Realtime Database
     @Bean
     public DatabaseReference firebaseDatabase() {
@@ -96,9 +98,11 @@ public class FirebaseConfiguration {
                         List<String> shoppersDeviceGroupKeys = orderService.shoperList(newOrder.getShopId());
                         logger.info("A QUE SHOPPERS LES LLEGARA LA NOTIFICAION: " + shoppersDeviceGroupKeys);
 
-                        fcmService.sendPushNotificationToShoppers(userService.getUserNotificationKey(customerId),
+                        thread = fcmService.sendPushNotificationToShoppers(userService.getUserNotificationKey(customerId),
                                 shoppersDeviceGroupKeys, MESSAGE_TITLE.getMessage(),
                                 NEW_ORDER_MESSAGE_BODY.getMessage(), newOrder);
+
+                        thread.start();
                     }
                 }
 
@@ -123,6 +127,10 @@ public class FirebaseConfiguration {
                                     userService.getUserNotificationKey(shopperId),
                                     MESSAGE_TITLE.getMessage() + userService.getUserFirstName(customerId),
                                     ORDER_TAKEN_MESSAGE_BODY.getMessage(), changedOrder);
+
+                            thread.interrupt();
+                            logger.info("Thread murio? " + thread.isAlive());
+
                             break;
                         // Orden llegó
                         case 2:
