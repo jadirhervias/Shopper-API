@@ -26,6 +26,8 @@ public class FCMService {
     // Notificar a todos los SHOPPERS más cercanos cuando un usuario CUSTOMER realizó una orden
     public Thread sendPushNotificationToShoppers(String senderDeviceFcmKey, List<?> receiverDeviceFcmKeys,
                                                String messageTitle, String messageBody, Order order) {
+//    public void sendPushNotificationToShoppers(String senderDeviceFcmKey, List<?> receiverDeviceFcmKeys,
+//            String messageTitle, String messageBody, Order order) {
 
         System.out.println("SEND PUSH NOTIFICATION TO THIS SHOPPERS: ");
         System.out.println("#: " + receiverDeviceFcmKeys.size());

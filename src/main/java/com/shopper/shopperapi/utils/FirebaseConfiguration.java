@@ -98,9 +98,10 @@ public class FirebaseConfiguration {
                         List<String> shoppersDeviceGroupKeys = orderService.shoperList(newOrder.getShopId());
                         logger.info("A QUE SHOPPERS LES LLEGARA LA NOTIFICAION: " + shoppersDeviceGroupKeys);
 
-                        thread = fcmService.sendPushNotificationToShoppers(userService.getUserNotificationKey(customerId),
-                                shoppersDeviceGroupKeys, MESSAGE_TITLE.getMessage(),
-                                NEW_ORDER_MESSAGE_BODY.getMessage(), newOrder);
+                        thread =
+                        fcmService.sendPushNotificationToShoppers(userService.getUserNotificationKey(customerId),
+                            shoppersDeviceGroupKeys, MESSAGE_TITLE.getMessage(),
+                            NEW_ORDER_MESSAGE_BODY.getMessage(), newOrder);
 
                         thread.start();
                     }
