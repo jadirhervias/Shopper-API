@@ -24,8 +24,10 @@ public class FCMService {
     private RestTemplate restTemplate;
 
     // Notificar a todos los SHOPPERS más cercanos cuando un usuario CUSTOMER realizó una orden
-    public Thread sendPushNotificationToShoppers(String senderDeviceFcmKey, List<?> receiverDeviceFcmKeys,
-                                               String messageTitle, String messageBody, Order order) {
+//    public Thread sendPushNotificationToShoppers(String senderDeviceFcmKey, List<?> receiverDeviceFcmKeys,
+//                                               String messageTitle, String messageBody, Order order) {
+    public void sendPushNotificationToShoppers(String senderDeviceFcmKey, List<?> receiverDeviceFcmKeys,
+            String messageTitle, String messageBody, Order order) {
 
         System.out.println("SEND PUSH NOTIFICATION TO THIS SHOPPERS: ");
         System.out.println("#: " + receiverDeviceFcmKeys.size());
@@ -47,13 +49,13 @@ public class FCMService {
         dataMessage.put("notificationType", firebaseNotification.getNotificationType());
         dataMessage.put("order", order);
 
-//        receiverDeviceFcmKeys.forEach(key -> {
-//            System.out.println("\nCalling fcm Server >>>>>>>");
-//            String response = callToFcmServer(notificationMsg, dataMessage, (String) key, senderDeviceFcmKey);
-//            System.out.println("Got response from fcm Server : " + response + "\n\n");
-//        });
+        receiverDeviceFcmKeys.forEach(key -> {
+            System.out.println("\nCalling fcm Server >>>>>>>");
+            String response = callToFcmServer(notificationMsg, dataMessage, (String) key, senderDeviceFcmKey);
+            System.out.println("Got response from fcm Server : " + response + "\n\n");
+        });
 
-        return notiticationThread(receiverDeviceFcmKeys, notificationMsg, dataMessage, senderDeviceFcmKey);
+//        return notiticationThread(receiverDeviceFcmKeys, notificationMsg, dataMessage, senderDeviceFcmKey);
     }
 
     private Thread notiticationThread(List<?> receiverDeviceFcmKeys, JSONObject notificationMsg, JSONObject dataMessage, String senderDeviceFcmKey) {

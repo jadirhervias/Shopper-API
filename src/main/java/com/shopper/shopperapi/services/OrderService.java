@@ -200,7 +200,7 @@ public class OrderService {
 		});
 	}
 
-	public boolean cardOperation(String sourceId, String customerId, String customerEmail, int totalCost) throws JSONException {
+	public boolean cardOperation(String sourceId, String customerId, String customerEmail, int totalCost) {
 
 		boolean success;
 
