@@ -1,7 +1,6 @@
 package com.shopper.shopperapi.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
 import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.*;
@@ -20,28 +19,24 @@ public class Product {
     private double cost;
     private String format;
     private String brand;
+
     // Used when is in the shopping car
     @Nullable
     @com.mongodb.lang.Nullable
     private Integer quantity;
+
     private int stock;
+
     @Nullable
-    @DBRef
-    private Image image;
+    private String image;
+
     @Nullable
-//    @NotNull
     @Field("last_update")
     @JsonProperty("last_update")
     private String lastUpdate;
 
 	public Product() {
 	}
-
-    @Nullable
-    @Exclude
-    public Image getImage() {
-        return image;
-    }
 
     @Override
     public String toString() {

@@ -74,22 +74,39 @@ public class ProductController {
 //        return ResponseEntity.ok(productPagination);
 //    }
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping
     @ApiOperation(value = "Crear producto", notes = "Servicio para crear productos")
     @ApiResponses(value = {
-        @ApiResponse(code = 201, message = "Producto creado correctamente"),
-        @ApiResponse(code = 400, message = "Solicitud Inválida")
+            @ApiResponse(code = 201, message = "Producto creado correctamente"),
+            @ApiResponse(code = 400, message = "Solicitud Inválida")
     })
-    public ResponseEntity<Product> createProduct(
-            @RequestPart(value = "image") MultipartFile file,
-            @RequestPart(value = "product") @Valid Product product) throws IOException {
-        Image image = imageService.addImage(file);
+    public ResponseEntity<Product> createProduct(@RequestBody @Valid Product product) {
         String newProductId = ObjectId.get().toHexString();
         product.setId(newProductId);
-        product.setImage(image);
+//        product.setImage("product-" + newProductId + ".png");
         Product newProduct = this.productService.create(product);
         return new ResponseEntity<>(newProduct, HttpStatus.CREATED);
     }
+
+    /**
+     * TODO: Implementar la subida de producto con imagen con Firebase Storage
+     */
+//    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+//    @ApiOperation(value = "Crear producto", notes = "Servicio para crear productos")
+//    @ApiResponses(value = {
+//        @ApiResponse(code = 201, message = "Producto creado correctamente"),
+//        @ApiResponse(code = 400, message = "Solicitud Inválida")
+//    })
+//    public ResponseEntity<Product> createProduct(
+//            @RequestPart(value = "image") MultipartFile file,
+//            @RequestPart(value = "product") @Valid Product product) throws IOException {
+//        Image image = imageService.addImage(file);
+//        String newProductId = ObjectId.get().toHexString();
+//        product.setId(newProductId);
+//        product.setImage(image);
+//        Product newProduct = this.productService.create(product);
+//        return new ResponseEntity<>(newProduct, HttpStatus.CREATED);
+//    }
 
     @PostMapping("/image/add")
     public ResponseEntity<?> createProductWithImage(
