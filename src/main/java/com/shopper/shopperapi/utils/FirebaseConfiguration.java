@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.PostConstruct;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
@@ -59,6 +60,7 @@ public class FirebaseConfiguration {
 
         try {
             InputStream serviceAccount = FirebaseConfiguration.class.getClassLoader().getResourceAsStream(configPath);
+//            FileInputStream refreshToken = new FileInputStream(configPath);
 
             if (serviceAccount == null) {
                 System.out.println("Service Account credentials not found!");
@@ -66,7 +68,9 @@ public class FirebaseConfiguration {
 
             FirebaseOptions options = new FirebaseOptions.Builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+//                    .setCredentials(GoogleCredentials.fromStream(refreshToken))
                     .setDatabaseUrl(databaseUrl)
+//                    .setStorageBucket("shopper-bf029.appspot.com")
                     .build();
 
             FirebaseApp.initializeApp(options);
