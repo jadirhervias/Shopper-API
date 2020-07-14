@@ -13,6 +13,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.validation.constraints.Email;
@@ -76,6 +77,10 @@ public class User {
     @JsonProperty("notification_device_group")
     private Map<String, String> notificationDeviceGroup;
 
+    @Nullable
+    @Field("shopping_cars")
+    private List<ShoppingCar> shoppingCars;
+
     public User() {
     }
 
@@ -86,20 +91,26 @@ public class User {
         return password;
     }
 
+    @Exclude
+    public List<ShoppingCar> getShoppingCars() {
+        return shoppingCars;
+    }
+
     @Override
     public String toString() {
         return "User{" +
-                "id=" + id +
-                ", first_name='" + firstName + '\'' +
-                ", last_name='" + lastName + '\'' +
+                "id='" + id + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
                 ", email='" + email + '\'' +
                 ", role='" + role + '\'' +
                 ", password='" + password + '\'' +
-                ", phone_number='" + phoneNumber + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
                 ", address='" + address + '\'' +
-                ", user_lat=" + userLat +
-                ", user_lng=" + userLng +
-                ", notification_device_group=" + notificationDeviceGroup +
+                ", userLat=" + userLat +
+                ", userLng=" + userLng +
+                ", notificationDeviceGroup=" + notificationDeviceGroup +
+                ", shoppingCars=" + shoppingCars +
                 '}';
     }
 
@@ -118,6 +129,7 @@ public class User {
                 Objects.equals(password, user.password) &&
                 Objects.equals(phoneNumber, user.phoneNumber) &&
                 Objects.equals(address, user.address) &&
-                Objects.equals(notificationDeviceGroup, user.notificationDeviceGroup);
+                Objects.equals(notificationDeviceGroup, user.notificationDeviceGroup) &&
+                Objects.equals(shoppingCars, user.shoppingCars);
     }
 }

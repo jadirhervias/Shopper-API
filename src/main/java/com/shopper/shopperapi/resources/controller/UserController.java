@@ -1,5 +1,6 @@
 package com.shopper.shopperapi.resources.controller;
 
+import com.shopper.shopperapi.models.ShoppingCar;
 import com.shopper.shopperapi.models.User;
 import com.shopper.shopperapi.services.UserService;
 import io.swagger.annotations.ApiOperation;
@@ -133,5 +134,17 @@ public class UserController {
         userToDelete.ifPresent(user -> {
             this.userService.delete(userToDelete.get());
         });
+    }
+
+//    Carrito de compras
+
+    @GetMapping("/shopping-cars/{id}")
+    public List<ShoppingCar> listUserShoppingCars(@PathVariable("id") String userId) {
+        return this.userService.userShoppingCars(userId);
+    }
+
+    @PostMapping("/shopping-cars/{id}")
+    public List<ShoppingCar> updateUserShoppingCar(@RequestBody ShoppingCar shoppingCar, @PathVariable("id") String userId) {
+        return this.userService.addProducts(userId, shoppingCar);
     }
 }

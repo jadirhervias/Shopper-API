@@ -1,5 +1,7 @@
 package com.shopper.shopperapi.services;
 
+import com.shopper.shopperapi.models.Product;
+import com.shopper.shopperapi.models.ShoppingCar;
 import com.shopper.shopperapi.models.User;
 import com.shopper.shopperapi.repositories.UserRepository;
 import org.bson.types.ObjectId;
@@ -8,10 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -138,5 +137,47 @@ public class UserService {
     @Transactional
     public void delete(User user) {
         this.userRepository.delete(user);
+    }
+
+    // Carrito de compras del usuario
+    public List<ShoppingCar> userShoppingCars(String id_user){
+        Optional<User> user = userRepository.findById(id_user);
+        return user.get().getShoppingCars();
+    }
+
+    public List<ShoppingCar> addProducts(String id_user, ShoppingCar shoppingCars) {
+        Optional<User> user = userRepository.findById(id_user);
+        List<ShoppingCar> favorite = new ArrayList<>();
+        if (user.get().getShoppingCars() != null) {
+            if (shoppingCars.getId() != null) {
+                favorite = user.get().getShoppingCars();
+                for (int i = 0; i < favorite.size(); i++) {
+                    ShoppingCar car = favorite.get(i);
+                    if (car.getId().equals(shoppingCars.getId())) {
+                        List<Product> products = car.getProducts();
+                        for (Product pro : shoppingCars.getProducts()) {
+                            products.add(pro);
+                        }
+                        favorite.get(i).setProducts(products);
+                        user.get().setShoppingCars(favorite);
+                        userRepository.save(user.get());
+                        break;
+                    }
+                }
+            }else {
+                favorite = user.get().getShoppingCars();
+                shoppingCars.setId(ObjectId.get().toHexString());
+                favorite.add(shoppingCars);
+                user.get().setShoppingCars(favorite);
+                userRepository.save(user.get());
+            }
+        }else {
+            shoppingCars.setId(ObjectId.get().toHexString());
+            favorite.add(shoppingCars);
+            user.get().setShoppingCars(favorite);
+            userRepository.save(user.get());
+        }
+
+        return user.get().getShoppingCars();
     }
 }
