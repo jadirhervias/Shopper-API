@@ -59,7 +59,7 @@ public class ApiSecurityConfiguration extends WebSecurityConfigurerAdapter {
             .and()
             .authorizeRequests()
                 // Registrar por mientras
-                .mvcMatchers(HttpMethod.POST, "users/sign-up").permitAll()
+                .mvcMatchers(HttpMethod.POST, "users").permitAll()
                 .mvcMatchers(HttpMethod.GET, "api/v1/shops/**").permitAll()
                 .antMatchers("/", "/login", "swagger-ui.html").permitAll()
             .anyRequest()
@@ -74,7 +74,7 @@ public class ApiSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     // Authentication
     @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+    protected void configure(AuthenticationManagerBuilder auth) {
         auth.authenticationProvider(daoAuthenticationProvider());
     }
 

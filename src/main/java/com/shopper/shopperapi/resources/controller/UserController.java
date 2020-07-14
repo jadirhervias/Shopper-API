@@ -62,7 +62,7 @@ public class UserController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAuthority('users:write')")
+//    @PreAuthorize("hasAuthority('users:write')")
     @ApiOperation(value = "Crear usuario", notes = "Servicio para crear usuarios")
     @ApiResponses(value = {
         @ApiResponse(code = 201, message = "Usuario creado correctamente"),
@@ -93,8 +93,8 @@ public class UserController {
             @ApiResponse(code = 201, message = "Usuario actualizado correctamente"),
             @ApiResponse(code = 404, message = "Usuario no encontrado")
     })
-    public ResponseEntity<User> updateUser(@PathVariable("id") ObjectId id, @Valid @RequestBody User userData) {
-        Optional<User> userToUpdate = this.userService.findById(id);
+    public ResponseEntity<User> updateUser(@PathVariable("id") String id, @RequestBody User newUserData) {
+        Optional<User> userToUpdate = this.userService.findById(new ObjectId(id));
 
         if (!userToUpdate.isPresent()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -112,7 +112,7 @@ public class UserController {
 //        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
 //        this.userService.update(id, newData.get());
-        this.userService.update(id, userData);
+        this.userService.update(id, newUserData);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

@@ -5,6 +5,8 @@ import com.shopper.shopperapi.models.ShoppingCar;
 import com.shopper.shopperapi.models.User;
 import com.shopper.shopperapi.repositories.UserRepository;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,8 @@ import java.util.*;
 @Service
 @Transactional(readOnly = true)
 public class UserService {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -122,11 +126,18 @@ public class UserService {
     /**
      * Método para actualizar usuario
      * @param id
-     * @param user
+     * @param newUserData
      */
     @Transactional
-    public void update(ObjectId id, User user) {
-        user.setId(id.toHexString());
+    public void update(String id, User newUserData) {
+        User user = userRepository.findById(new ObjectId(id)).get();
+        user.setId(id);
+        user.setAddress(newUserData.getAddress());
+        user.setFirstName(newUserData.getFirstName());
+        user.setLastName(newUserData.getLastName());
+        user.setPhoneNumber(newUserData.getPhoneNumber());
+        user.setUserLat(newUserData.getUserLat());
+        user.setUserLng(newUserData.getUserLng());
         this.userRepository.save(user);
     }
 
@@ -145,36 +156,64 @@ public class UserService {
         return user.get().getShoppingCars();
     }
 
-    public List<ShoppingCar> addProducts(String id_user, ShoppingCar shoppingCars) {
+    public double calculateTotalCost(List<Product> products) {
+        double totalCost = products.stream().mapToDouble((product) -> product.getCost() * product.getQuantity()).sum();
+        return Math.round(totalCost * Math.pow(10, 2)) / Math.pow(10, 2);
+    }
+
+    public int calculateQuantity(List<Product> products) {
+        return products.stream().mapToInt(Product::getQuantity).sum();
+    }
+
+    public List<ShoppingCar> addProducts(String id_user, ShoppingCar shoppingCar) {
         Optional<User> user = userRepository.findById(id_user);
-        List<ShoppingCar> favorite = new ArrayList<>();
+        List<ShoppingCar> userShoppingCars = new ArrayList<>();
         if (user.get().getShoppingCars() != null) {
-            if (shoppingCars.getId() != null) {
-                favorite = user.get().getShoppingCars();
-                for (int i = 0; i < favorite.size(); i++) {
-                    ShoppingCar car = favorite.get(i);
-                    if (car.getId().equals(shoppingCars.getId())) {
+            if (shoppingCar.getId() != null) {
+                userShoppingCars = user.get().getShoppingCars();
+                for (int i = 0; i < userShoppingCars.size(); i++) {
+                    ShoppingCar car = userShoppingCars.get(i);
+                    if (car.getId().equals(shoppingCar.getId())) {
                         List<Product> products = car.getProducts();
-                        for (Product pro : shoppingCars.getProducts()) {
+                        for (Product pro : shoppingCar.getProducts()) {
                             products.add(pro);
                         }
-                        favorite.get(i).setProducts(products);
-                        user.get().setShoppingCars(favorite);
+                        car.setProducts(products);
+
+                        int count = this.calculateQuantity(car.getProducts());
+                        car.setCount(count);
+
+                        double totalCost = this.calculateTotalCost(car.getProducts());
+                        car.setTotalCost(totalCost);
+
+                        user.get().setShoppingCars(userShoppingCars);
                         userRepository.save(user.get());
                         break;
                     }
                 }
-            }else {
-                favorite = user.get().getShoppingCars();
-                shoppingCars.setId(ObjectId.get().toHexString());
-                favorite.add(shoppingCars);
-                user.get().setShoppingCars(favorite);
+            } else {
+                /**
+                 * TODO: Remover porque es redundante y puede ser que nunca se ejecute
+                 */
+                userShoppingCars = user.get().getShoppingCars();
+                shoppingCar.setId(ObjectId.get().toHexString());
+                userShoppingCars.add(shoppingCar);
+                user.get().setShoppingCars(userShoppingCars);
                 userRepository.save(user.get());
             }
-        }else {
-            shoppingCars.setId(ObjectId.get().toHexString());
-            favorite.add(shoppingCars);
-            user.get().setShoppingCars(favorite);
+        } else {
+            shoppingCar.setId(ObjectId.get().toHexString());
+
+            int count = this.calculateQuantity(shoppingCar.getProducts());
+            shoppingCar.setCount(count);
+
+            double totalCost = this.calculateTotalCost(shoppingCar.getProducts());
+            shoppingCar.setTotalCost(totalCost);
+
+            // agregar obj Shopping Car
+            userShoppingCars.add(shoppingCar);
+            // agregar lista de Shopping cars
+            user.get().setShoppingCars(userShoppingCars);
             userRepository.save(user.get());
         }
 

@@ -58,7 +58,7 @@ public class UserNotificationController {
         deviceGroupKeys.put("notification_key", notificationKey);
         deviceGroupKeys.put("notification_key_name", "appUser-" + deviceGroup.getUserId());
         user.setNotificationDeviceGroup(deviceGroupKeys);
-        userService.update(new ObjectId(deviceGroup.getUserId()), user);
+        userService.update(deviceGroup.getUserId(), user);
 
         return new ResponseEntity<>(userNotificationDeviceGroup, HttpStatus.OK);
     }

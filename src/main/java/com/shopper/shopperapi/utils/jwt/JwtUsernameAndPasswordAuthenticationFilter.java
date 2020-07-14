@@ -1,12 +1,15 @@
 package com.shopper.shopperapi.utils.jwt;
 
 import com.shopper.shopperapi.models.User;
+import com.shopper.shopperapi.services.FCMService;
 import com.shopper.shopperapi.services.UserService;
 import com.shopper.shopperapi.utils.apiKeyToken.ApiKeyTokenRequest;
 import com.shopper.shopperapi.utils.apiKeyToken.ApiKeyTokenVerifier;
 
 import io.jsonwebtoken.Jwts;
 import net.minidev.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,6 +28,9 @@ import java.util.Date;
 import java.util.Optional;
 
 public class JwtUsernameAndPasswordAuthenticationFilter extends GenericFilterBean {
+
+    private static final Logger logger = LoggerFactory.getLogger(JwtUsernameAndPasswordAuthenticationFilter.class);
+
     private final JwtConfig jwtConfig;
     private final SecretKey secretKey;
     private final ApiKeyTokenVerifier apiKeyTokenVerifier;
@@ -94,6 +100,8 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends GenericFilterBea
                         SecurityContext sc = SecurityContextHolder.getContext();
                         Authentication authResult = sc.getAuthentication();
 
+                        logger.info("auth context result: " + authResult);
+
                         String token = Jwts.builder()
                                 .setSubject(authResult.getName())
                                 .claim("authorities", authResult.getAuthorities())
@@ -104,15 +112,17 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends GenericFilterBea
 
                         JSONObject json = new JSONObject();
                         userJson.put("email", authResult.getName());
-                        Optional<User> user = this.usuario(authResult.getName());
+                        Optional<User> user = this.userService.findByEmail(authResult.getName());
                         userJson.put("id", user.get().getId());
                         userJson.put("email", user.get().getEmail());
                         userJson.put("first_name", user.get().getFirstName());
                         userJson.put("last_name", user.get().getLastName());
+                        userJson.put("role", user.get().getRole());
                         userJson.put("addres", user.get().getAddress());
                         userJson.put("user_lat", user.get().getUserLat());
                         userJson.put("user_lng", user.get().getUserLng());
                         userJson.put("phone_number", user.get().getPhoneNumber());
+//                        if (user.get().getNotificationDeviceGroup() != null)
                         userJson.put("notification", user.get().getNotificationDeviceGroup());
                         json.put("token", token);
                         json.put("user", userJson);
@@ -134,9 +144,5 @@ public class JwtUsernameAndPasswordAuthenticationFilter extends GenericFilterBea
             filterChain.doFilter(request, response);
         }
 
-    }
-    
-    public Optional<User> usuario(String email) {
-    	return this.userService.findByEmail(email);
     }
 }

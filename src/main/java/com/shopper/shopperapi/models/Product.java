@@ -3,6 +3,7 @@ package com.shopper.shopperapi.models;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.firebase.database.IgnoreExtraProperties;
 import lombok.Data;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.*;
 
 import javax.annotation.Nullable;

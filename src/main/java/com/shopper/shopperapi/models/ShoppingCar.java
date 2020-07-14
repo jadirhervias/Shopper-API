@@ -6,6 +6,8 @@ import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.firebase.database.IgnoreExtraProperties;
 import lombok.Data;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -26,6 +28,10 @@ public class ShoppingCar {
 	private int count;
 
 	@Nullable
+	@JsonProperty("total_cost")
+	private double totalCost;
+
+	@Nullable
 	@JsonProperty("shop_id")
 	private String shopId;
 
@@ -33,12 +39,14 @@ public class ShoppingCar {
 	}
 
 	@Override
-	public String toString() {
+	public String
+	toString() {
 		return "ShoppingCar{" +
 				"id='" + id + '\'' +
 				", name='" + name + '\'' +
 				", products=" + products +
 				", count=" + count +
+				", totalCost=" + totalCost +
 				", shopId='" + shopId + '\'' +
 				'}';
 	}
@@ -49,6 +57,7 @@ public class ShoppingCar {
 		if (o == null || getClass() != o.getClass()) return false;
 		ShoppingCar that = (ShoppingCar) o;
 		return count == that.count &&
+				Double.compare(that.totalCost, totalCost) == 0 &&
 				Objects.equals(id, that.id) &&
 				Objects.equals(name, that.name) &&
 				Objects.equals(products, that.products) &&
