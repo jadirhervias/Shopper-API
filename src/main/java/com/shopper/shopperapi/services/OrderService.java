@@ -1,12 +1,15 @@
 package com.shopper.shopperapi.services;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import com.google.firebase.database.*;
 import com.shopper.shopperapi.models.*;
 import net.minidev.json.JSONObject;
 import com.shopper.shopperapi.utils.distance.DistanceCalculated;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 
 import com.shopper.shopperapi.repositories.OrderRepository;
@@ -49,8 +52,25 @@ public class OrderService {
 	}
 
 	// Completed/cancelled orders by customer id
-	public List<Order> findOrdersByCustomerId(String customerId){
-		return this.orderRepository.findByCustomerId(customerId);
+	public List<?> findOrdersByCustomerId(String customerId) {
+		List<Order> orders = this.orderRepository.findAll();
+		return orders.stream()
+				.map((order) -> {
+					if (order.getCustomer().getId().equals(customerId)) {
+						order.getCustomer().setShoppingCars(null);
+						order.getCustomer().setNotificationDeviceGroup(null);
+						order.getCustomer().setPassword(null);
+						if (order.getShopper() != null) {
+							order.getShopper().setShoppingCars(null);
+							order.getShopper().setNotificationDeviceGroup(null);
+							order.getShopper().setPassword(null);
+						}
+						return order;
+					}
+					return null;
+				})
+				.filter(Objects::nonNull)
+				.collect(Collectors.toList());
 	}
 
 	// Pending orders by customer id

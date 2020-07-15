@@ -38,7 +38,7 @@ public class OrderController {
     @PreAuthorize("hasRole('ROLE_CUSTOMER')")
     public ResponseEntity<?> getOrders(
             @PathVariable("customerId") String customerId) {
-        List<Order> orders = orderService.findOrdersByCustomerId(customerId);
+        List<?> orders = orderService.findOrdersByCustomerId(customerId);
         return new ResponseEntity<>(orders, HttpStatus.OK);
     }
 

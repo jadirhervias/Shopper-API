@@ -12,6 +12,4 @@ import java.util.List;
 @Repository
 public interface OrderRepository extends MongoRepository<Order, String>{
 	Order findById(ObjectId id);
-	@Query(value = "{customer.$id.$oid:?0}")
-	List<Order> findByCustomerId(String customerId);
 }
