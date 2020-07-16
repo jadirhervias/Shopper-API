@@ -139,17 +139,21 @@ public class UserController {
 //    Carrito de compras
 
     @GetMapping("/shopping-cars/{id}")
-    public List<ShoppingCar> listUserShoppingCars(@PathVariable("id") String userId) {
-        return this.userService.userShoppingCars(userId);
+    public ResponseEntity<?> listUserShoppingCars(@PathVariable("id") String userId) {
+        List<ShoppingCar> userSHoppingCars = this.userService.userShoppingCars(userId);
+        return new ResponseEntity<>(userSHoppingCars, HttpStatus.OK);
     }
 
     @PostMapping("/shopping-cars/{id}")
-    public List<ShoppingCar> updateUserShoppingCar(@RequestBody ShoppingCar shoppingCar, @PathVariable("id") String userId) {
-        return this.userService.addProducts(userId, shoppingCar);
+    public ResponseEntity<?> updateUserShoppingCar(@RequestBody ShoppingCar shoppingCar, @PathVariable("id") String userId) {
+        List<ShoppingCar> newShoppingCar = this.userService.addProducts(userId, shoppingCar);
+        return new ResponseEntity<>(newShoppingCar, HttpStatus.CREATED);
     }
 
-    @PostMapping("/favorites/delete/product/{id}/{id_car}")
-    public ShoppingCar favoritesDelete(@RequestBody ShoppingCar shoppingCars,@PathVariable("id") String id_user,@PathVariable("id_car") String id_car) {
-        return this.userService.deleteFavoriteProduct(id_user, shoppingCars,id_car);
+    @PostMapping("/favorites/delete/product/{id}/{idCar}")
+    public ResponseEntity<?> favoritesDelete(@RequestBody ShoppingCar shoppingCars,
+                                       @PathVariable("id") String idCustomer, @PathVariable("idCar") String idCar) {
+        ShoppingCar newShoppingCar = this.userService.deleteFavoriteProduct(idCustomer, shoppingCars,idCar);
+        return new ResponseEntity<>(newShoppingCar, HttpStatus.OK);
     }
 }
