@@ -147,4 +147,9 @@ public class UserController {
     public List<ShoppingCar> updateUserShoppingCar(@RequestBody ShoppingCar shoppingCar, @PathVariable("id") String userId) {
         return this.userService.addProducts(userId, shoppingCar);
     }
+
+    @PostMapping("/favorites/delete/product/{id}/{id_car}")
+    public ShoppingCar favoritesDelete(@RequestBody ShoppingCar shoppingCars,@PathVariable("id") String id_user,@PathVariable("id_car") String id_car) {
+        return this.userService.deleteFavoriteProduct(id_user, shoppingCars,id_car);
+    }
 }

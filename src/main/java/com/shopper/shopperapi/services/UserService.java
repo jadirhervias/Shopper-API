@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -218,5 +220,37 @@ public class UserService {
         }
 
         return user.get().getShoppingCars();
+    }
+
+    public ShoppingCar findCarUser(String id_user,String id_car) {
+        List<ShoppingCar> userShoppingCars = userRepository.findById(id_user).get().getShoppingCars();
+        if (userShoppingCars != null && userShoppingCars.size() > 1) {
+            Optional<ShoppingCar> shoppingCar = userShoppingCars
+                    .stream()
+                    .filter((item) -> item.getId().equals(id_car))
+                    .findFirst();
+            return shoppingCar.get();
+        }
+        return null;
+    }
+
+    public ShoppingCar deleteFavoriteProduct(String id_user,ShoppingCar shoppingCar,String id_car){
+        Optional<User> user = userRepository.findById(id_user);
+        ShoppingCar userCar = this.findCarUser(id_user, id_car);
+        List<Product> productsDelete = shoppingCar.getProducts();
+        Predicate<Product> isInTheCar = item -> (productsDelete.stream().map(Product::getId).collect(Collectors.toSet()).contains(item.getId()));
+        Predicate<Product> isNotThecar = Predicate.not(isInTheCar);
+        List<Product> productsUpdate = userCar.getProducts().stream().filter(isNotThecar).collect(Collectors.toList());
+        int i = 0;
+        for (ShoppingCar car : Objects.requireNonNull(user.get().getShoppingCars())) {
+            if (car.getId().equals(id_car)) {
+                car.setProducts(productsUpdate);
+                user.get().getShoppingCars().get(i).setProducts(productsUpdate);
+                userRepository.save(user.get());
+                break;
+            }
+            i++;
+        }
+        return user.get().getShoppingCars().get(i);
     }
 }
