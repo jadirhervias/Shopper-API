@@ -15,6 +15,9 @@ import org.springframework.boot.configurationprocessor.json.JSONException;
 import com.shopper.shopperapi.repositories.OrderRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,7 +55,7 @@ public class OrderService {
 	}
 
 	// Completed/cancelled orders by customer id
-	public List<?> findOrdersByCustomerId(String customerId) {
+	public List<Order> findOrdersByCustomerId(String customerId) {
 		List<Order> orders = this.orderRepository.findAll();
 		return orders.stream()
 				.map((order) -> {
@@ -71,6 +74,25 @@ public class OrderService {
 				})
 				.filter(Objects::nonNull)
 				.collect(Collectors.toList());
+	}
+
+	/**
+	 * Obtener una lista de ordenes paginadas por id de customer
+	 * @param customerId-
+	 * @param pageable-
+	 * @return Page<Order>
+	 */
+	public Page<Order> findOrderPageByCustomerId(String customerId, Pageable pageable) {
+
+		List<Order> userOrders = this.findOrdersByCustomerId(customerId);
+
+		int start = (int) pageable.getOffset();
+
+		int end = Math.min((start + pageable.getPageSize()), userOrders.size());
+
+		Page<Order> ordersPage = new PageImpl<>(userOrders.subList(start, end), pageable, userOrders.size());
+
+		return ordersPage;
 	}
 
 	// Pending orders by customer id

@@ -1,6 +1,7 @@
 package com.shopper.shopperapi.resources.controller;
 
 import com.shopper.shopperapi.models.Category;
+import com.shopper.shopperapi.models.Product;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;

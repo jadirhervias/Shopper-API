@@ -6,7 +6,7 @@ import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.firebase.database.IgnoreExtraProperties;
 import lombok.Data;
-import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.List;
 import java.util.Objects;
@@ -28,10 +28,12 @@ public class ShoppingCar {
 	private int count;
 
 	@Nullable
+	@Field("total_cost")
 	@JsonProperty("total_cost")
 	private double totalCost;
 
 	@Nullable
+	@Field("shop_id")
 	@JsonProperty("shop_id")
 	private String shopId;
 

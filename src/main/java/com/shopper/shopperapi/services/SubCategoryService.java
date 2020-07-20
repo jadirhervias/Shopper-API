@@ -5,6 +5,7 @@ import com.shopper.shopperapi.models.SubCategory;
 import com.shopper.shopperapi.repositories.SubCategoriyRepository;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +40,9 @@ public class SubCategoryService {
     }
 
     /**
+     *  TODO: Implementar controlador con Pageable request
+     */
+    /**
      * Método para retornar una lista de categorías paginadas
      */
     public Page<SubCategory> findSubCategoryPagesById(ObjectId id, Pageable pageable) {
@@ -47,16 +51,21 @@ public class SubCategoryService {
 
     /**
      * Obtener una lista de productos por categoría para paginar
-     * @param id
-     * @return List<?>
+     * @param id-
+     * @param pageable-
+     * @return List<Product>
      */
-    public List<Product> findProductsBySubCategoryId(ObjectId id) {
-        List<Product> products = findById(id).getProducts();
-        return products;
-    }
-    public List<Product> findProductsById(ObjectId id) {
-        List<Product> products = findById(id).getProducts();
-        return products;
+    public Page<Product> findProductsPagesById(ObjectId id, Pageable pageable) {
+
+        List<Product> products = this.findById(id).getProducts();
+
+        int start = (int) pageable.getOffset();
+
+        int end = Math.min((start + pageable.getPageSize()), products.size());
+
+        Page<Product> prodcutsPage = new PageImpl<>(products.subList(start, end), pageable, products.size());
+
+        return prodcutsPage;
     }
 
     /**

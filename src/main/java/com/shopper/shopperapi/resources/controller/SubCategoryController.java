@@ -1,5 +1,6 @@
 package com.shopper.shopperapi.resources.controller;
 
+import com.shopper.shopperapi.models.Product;
 import com.shopper.shopperapi.models.SubCategory;
 import com.shopper.shopperapi.services.SubCategoryService;
 import io.swagger.annotations.Api;
@@ -38,14 +39,14 @@ public class SubCategoryController {
         return ResponseEntity.ok(this.subCategoryService.findAll());
     }
 
-    // Custom pagination for sub categories
+    // Custom products pagination for sub categories
     @GetMapping("{idSubCategory}/pagination")
-    public ResponseEntity<Page<SubCategory>> getProductsBySubCategoryId(@PathVariable("idSubCategory") ObjectId idSubCategory,
+    public ResponseEntity<Page<Product>> getProductsBySubCategoryId(@PathVariable("idSubCategory") String idSubCategory,
                                                                   @RequestParam Optional<Integer> page,
                                                                   @RequestParam Optional<String> sortBy) {
 
-        Page<SubCategory> subCategories = this.subCategoryService.findSubCategoryPagesById(
-                idSubCategory,
+        Page<Product> productPages = this.subCategoryService.findProductsPagesById(
+                new ObjectId(idSubCategory),
                 PageRequest.of(
                         page.orElse(0),
                         25,
@@ -54,7 +55,7 @@ public class SubCategoryController {
                 )
         );
 
-        return ResponseEntity.ok(subCategories);
+        return ResponseEntity.ok(productPages);
     }
 
     @GetMapping("/{id}")

@@ -1,5 +1,6 @@
 package com.shopper.shopperapi.services;
 
+import com.shopper.shopperapi.models.Order;
 import com.shopper.shopperapi.models.Product;
 import com.shopper.shopperapi.models.ShoppingCar;
 import com.shopper.shopperapi.models.User;
@@ -8,6 +9,9 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +23,8 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(readOnly = true)
 public class UserService {
+
+    private final double commisionCost = 5;
 
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
@@ -153,22 +159,41 @@ public class UserService {
     }
 
     // Carrito de compras del usuario
-    public List<ShoppingCar> userShoppingCars(String id_user){
-        Optional<User> user = userRepository.findById(id_user);
+    public List<ShoppingCar> userShoppingCars(String idUser){
+        Optional<User> user = userRepository.findById(idUser);
         return user.get().getShoppingCars();
+    }
+
+    /**
+     * Obtener una lista carritos de compra paginadas por id de customer
+     * @param customerId-
+     * @param pageable-
+     * @return Page<ShoppingCar>
+     */
+    public Page<ShoppingCar> findShoppingCarPageByCustomerId(String customerId, Pageable pageable) {
+
+        List<ShoppingCar> userShoppingCars = this.userShoppingCars(customerId);
+
+        int start = (int) pageable.getOffset();
+
+        int end = Math.min((start + pageable.getPageSize()), userShoppingCars.size());
+
+        Page<ShoppingCar> shoppingCarsPage = new PageImpl<>(userShoppingCars.subList(start, end), pageable, userShoppingCars.size());
+
+        return shoppingCarsPage;
     }
 
     public double calculateTotalCost(List<Product> products) {
         double totalCost = products.stream().mapToDouble((product) -> product.getCost() * product.getQuantity()).sum();
-        return Math.round(totalCost * Math.pow(10, 2)) / Math.pow(10, 2);
+        return Math.round((totalCost + commisionCost) * Math.pow(10, 2)) / Math.pow(10, 2);
     }
 
     public int calculateQuantity(List<Product> products) {
         return products.stream().mapToInt(Product::getQuantity).sum();
     }
 
-    public List<ShoppingCar> addProducts(String id_user, ShoppingCar shoppingCar) {
-        Optional<User> user = userRepository.findById(id_user);
+    public List<ShoppingCar> addProducts(String idUser, ShoppingCar shoppingCar) {
+        Optional<User> user = userRepository.findById(idUser);
         List<ShoppingCar> userShoppingCars = new ArrayList<>();
         if (user.get().getShoppingCars() != null) {
             if (shoppingCar.getId() != null) {
@@ -199,6 +224,13 @@ public class UserService {
                  */
                 userShoppingCars = user.get().getShoppingCars();
                 shoppingCar.setId(ObjectId.get().toHexString());
+
+                int count = this.calculateQuantity(shoppingCar.getProducts());
+                shoppingCar.setCount(count);
+
+                double totalCost = this.calculateTotalCost(shoppingCar.getProducts());
+                shoppingCar.setTotalCost(totalCost);
+
                 userShoppingCars.add(shoppingCar);
                 user.get().setShoppingCars(userShoppingCars);
                 userRepository.save(user.get());
@@ -222,28 +254,34 @@ public class UserService {
         return user.get().getShoppingCars();
     }
 
-    public ShoppingCar findCarUser(String id_user,String id_car) {
-        List<ShoppingCar> userShoppingCars = userRepository.findById(id_user).get().getShoppingCars();
+    public ShoppingCar findCarUser(String idUser,String idCar) {
+        List<ShoppingCar> userShoppingCars = userRepository.findById(idUser).get().getShoppingCars();
         if (userShoppingCars != null && userShoppingCars.size() > 1) {
             Optional<ShoppingCar> shoppingCar = userShoppingCars
                     .stream()
-                    .filter((item) -> item.getId().equals(id_car))
+                    .filter((item) -> item.getId().equals(idCar))
                     .findFirst();
             return shoppingCar.get();
         }
         return null;
     }
 
-    public ShoppingCar deleteFavoriteProduct(String id_user,ShoppingCar shoppingCar,String id_car){
-        Optional<User> user = userRepository.findById(id_user);
-        ShoppingCar userCar = this.findCarUser(id_user, id_car);
+    public ShoppingCar deleteFavoriteProduct(String idUser,ShoppingCar shoppingCar,String idCar){
+        Optional<User> user = userRepository.findById(idUser);
+        ShoppingCar userCar = this.findCarUser(idUser, idCar);
         List<Product> productsDelete = shoppingCar.getProducts();
-        Predicate<Product> isInTheCar = item -> (productsDelete.stream().map(Product::getId).collect(Collectors.toSet()).contains(item.getId()));
+        Predicate<Product> isInTheCar = item -> productsDelete.stream()
+                .map(Product::getId)
+                .collect(Collectors.toSet())
+                .contains(item.getId());
         Predicate<Product> isNotThecar = Predicate.not(isInTheCar);
-        List<Product> productsUpdate = userCar.getProducts().stream().filter(isNotThecar).collect(Collectors.toList());
+        List<Product> productsUpdate = userCar.getProducts()
+                .stream()
+                .filter(isNotThecar)
+                .collect(Collectors.toList());
         int i = 0;
         for (ShoppingCar car : Objects.requireNonNull(user.get().getShoppingCars())) {
-            if (car.getId().equals(id_car)) {
+            if (car.getId().equals(idCar)) {
                 car.setProducts(productsUpdate);
                 user.get().getShoppingCars().get(i).setProducts(productsUpdate);
                 userRepository.save(user.get());

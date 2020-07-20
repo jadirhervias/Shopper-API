@@ -1,5 +1,6 @@
 package com.shopper.shopperapi.resources.controller;
 
+import com.shopper.shopperapi.models.Order;
 import com.shopper.shopperapi.models.ShoppingCar;
 import com.shopper.shopperapi.models.User;
 import com.shopper.shopperapi.services.UserService;
@@ -8,6 +9,9 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Api;
 import org.bson.types.ObjectId;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -137,11 +141,28 @@ public class UserController {
     }
 
 //    Carrito de compras
-
     @GetMapping("/shopping-cars/{id}")
     public ResponseEntity<?> listUserShoppingCars(@PathVariable("id") String userId) {
         List<ShoppingCar> userSHoppingCars = this.userService.userShoppingCars(userId);
         return new ResponseEntity<>(userSHoppingCars, HttpStatus.OK);
+    }
+
+    // Carritos de compras con paginacion
+    @GetMapping("/shopping-cars/{customerId}/pagination")
+    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
+    public ResponseEntity<?> getUserShoppingCarsPage(@PathVariable("customerId") String customerId,
+                                                     @RequestParam Optional<Integer> page,
+                                                     @RequestParam Optional<String> sortBy) {
+        Page<ShoppingCar> shoppingCarsPage = this.userService.findShoppingCarPageByCustomerId(
+                customerId,
+                PageRequest.of(
+                        page.orElse(0),
+                        5,
+                        Sort.Direction.ASC,
+                        sortBy.orElse("id")
+                )
+        );
+        return new ResponseEntity<>(shoppingCarsPage, HttpStatus.OK);
     }
 
     @PostMapping("/shopping-cars/{id}")
@@ -150,7 +171,7 @@ public class UserController {
         return new ResponseEntity<>(newShoppingCar, HttpStatus.CREATED);
     }
 
-    @PostMapping("/favorites/delete/product/{id}/{idCar}")
+    @PostMapping("/shopping-cars/{id}/{idCar}")
     public ResponseEntity<?> favoritesDelete(@RequestBody ShoppingCar shoppingCars,
                                        @PathVariable("id") String idCustomer, @PathVariable("idCar") String idCar) {
         ShoppingCar newShoppingCar = this.userService.deleteFavoriteProduct(idCustomer, shoppingCars,idCar);

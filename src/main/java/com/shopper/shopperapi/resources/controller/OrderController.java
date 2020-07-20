@@ -1,12 +1,17 @@
 package com.shopper.shopperapi.resources.controller;
 
 import com.shopper.shopperapi.models.Order;
+import com.shopper.shopperapi.models.Product;
 import com.shopper.shopperapi.services.OrderService;
 
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -23,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -40,6 +46,24 @@ public class OrderController {
             @PathVariable("customerId") String customerId) {
         List<?> orders = orderService.findOrdersByCustomerId(customerId);
         return new ResponseEntity<>(orders, HttpStatus.OK);
+    }
+
+    @GetMapping("/{customerId}/pagination")
+    @PreAuthorize("hasRole('ROLE_CUSTOMER')")
+    public ResponseEntity<?> getOrdersPage(
+            @PathVariable("customerId") String customerId,
+            @RequestParam Optional<Integer> page,
+            @RequestParam Optional<String> sortBy) {
+        Page<Order> ordersPage = this.orderService.findOrderPageByCustomerId(
+                customerId,
+                PageRequest.of(
+                        page.orElse(0),
+                        5,
+                        Sort.Direction.ASC,
+                        sortBy.orElse("id")
+                )
+        );
+        return new ResponseEntity<>(ordersPage, HttpStatus.OK);
     }
 
     @PostMapping("/new")

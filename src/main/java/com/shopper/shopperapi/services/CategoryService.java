@@ -1,6 +1,7 @@
 package com.shopper.shopperapi.services;
 
 import com.shopper.shopperapi.models.Category;
+import com.shopper.shopperapi.models.Product;
 import com.shopper.shopperapi.repositories.CategoryRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +18,6 @@ public class CategoryService {
 
     @Autowired
     private CategoryRepository categoryRepository;
-
-//    public CategoryService(CategoryRepository categoryRepository) {
-//        this.categoryRepository = categoryRepository;
-//    }
 
     /**
      * Método para listar categorías de productos
