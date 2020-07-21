@@ -1,10 +1,8 @@
 package com.shopper.shopperapi.resources.controller;
 
 import com.shopper.shopperapi.models.Order;
-import com.shopper.shopperapi.models.Product;
 import com.shopper.shopperapi.services.OrderService;
 
-import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +25,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+
+import java.text.ParseException;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,7 +43,7 @@ public class OrderController {
     @GetMapping("/{customerId}")
     @PreAuthorize("hasRole('ROLE_CUSTOMER')")
     public ResponseEntity<?> getOrders(
-            @PathVariable("customerId") String customerId) {
+            @PathVariable("customerId") String customerId) throws ParseException {
         List<?> orders = orderService.findOrdersByCustomerId(customerId);
         return new ResponseEntity<>(orders, HttpStatus.OK);
     }
@@ -53,7 +53,7 @@ public class OrderController {
     public ResponseEntity<?> getOrdersPage(
             @PathVariable("customerId") String customerId,
             @RequestParam Optional<Integer> page,
-            @RequestParam Optional<String> sortBy) {
+            @RequestParam Optional<String> sortBy) throws ParseException {
         Page<Order> ordersPage = this.orderService.findOrderPageByCustomerId(
                 customerId,
                 PageRequest.of(

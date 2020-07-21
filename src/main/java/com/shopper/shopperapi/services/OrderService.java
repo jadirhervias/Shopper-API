@@ -1,5 +1,7 @@
 package com.shopper.shopperapi.services;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -55,21 +57,40 @@ public class OrderService {
 	}
 
 	// Completed/cancelled orders by customer id
-	public List<Order> findOrdersByCustomerId(String customerId) {
+	public List<Order> findOrdersByCustomerId(String customerId) throws ParseException {
 		List<Order> orders = this.orderRepository.findAll();
+		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		Calendar calendar = Calendar.getInstance();
+		calendar.set(Calendar.DAY_OF_MONTH,1);
+		String firstDayMonth = sdf.format(calendar.getTime());
+		calendar.set(Calendar.MONTH,calendar.get(Calendar.MONTH)+1);
+		String nextFirstDayMonth = sdf.format(calendar.getTime());
+		//Tranformandolo a date
+		Date nextFirstDayMonthDate = sdf.parse(nextFirstDayMonth);
+		Date firstDayMonthDate = sdf.parse(firstDayMonth);
+		
 		return orders.stream()
 				.map((order) -> {
-					if (order.getCustomer().getId().equals(customerId)) {
-						order.getCustomer().setShoppingCars(null);
-						order.getCustomer().setNotificationDeviceGroup(null);
-						order.getCustomer().setPassword(null);
-						if (order.getShopper() != null) {
-							order.getShopper().setShoppingCars(null);
-							order.getShopper().setNotificationDeviceGroup(null);
-							order.getShopper().setPassword(null);
+					try {
+						Date orderDate = sdf.parse(order.getFechaCompra());
+						if (orderDate.after(firstDayMonthDate) && orderDate.before(nextFirstDayMonthDate)) {
+							if (order.getCustomer().getId().equals(customerId)) {
+								order.getCustomer().setShoppingCars(null);
+								order.getCustomer().setNotificationDeviceGroup(null);
+								order.getCustomer().setPassword(null);
+								if (order.getShopper() != null) {
+									order.getShopper().setShoppingCars(null);
+									order.getShopper().setNotificationDeviceGroup(null);
+									order.getShopper().setPassword(null);
+								}
+								return order;
+							}
 						}
-						return order;
+					} catch (ParseException e) {
+						e.printStackTrace();
 					}
+					
 					return null;
 				})
 				.filter(Objects::nonNull)
@@ -84,15 +105,22 @@ public class OrderService {
 	 */
 	public Page<Order> findOrderPageByCustomerId(String customerId, Pageable pageable) {
 
-		List<Order> userOrders = this.findOrdersByCustomerId(customerId);
+		List<Order> userOrders;
+		try {
+			userOrders = this.findOrdersByCustomerId(customerId);
+			
+			int start = (int) pageable.getOffset();
 
-		int start = (int) pageable.getOffset();
+			int end = Math.min((start + pageable.getPageSize()), userOrders.size());
 
-		int end = Math.min((start + pageable.getPageSize()), userOrders.size());
+			Page<Order> ordersPage = new PageImpl<>(userOrders.subList(start, end), pageable, userOrders.size());
 
-		Page<Order> ordersPage = new PageImpl<>(userOrders.subList(start, end), pageable, userOrders.size());
-
-		return ordersPage;
+			return ordersPage;
+			
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	// Pending orders by customer id
