@@ -66,6 +66,12 @@ public class OrderController {
         return new ResponseEntity<>(ordersPage, HttpStatus.OK);
     }
 
+    @GetMapping("/find/{orderId}")
+    public ResponseEntity<?> orderDetail(@PathVariable("orderId")String orderId){
+        Order order = orderService.findOrder(orderId);
+        return new ResponseEntity<>(order, HttpStatus.OK);
+    }
+
     @PostMapping("/new")
     @PreAuthorize("hasAuthority('orders:write')")
     public ResponseEntity<?> newOrder(@RequestBody @Valid Order order) {

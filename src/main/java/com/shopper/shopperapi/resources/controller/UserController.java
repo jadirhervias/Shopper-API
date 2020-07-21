@@ -1,6 +1,5 @@
 package com.shopper.shopperapi.resources.controller;
 
-import com.shopper.shopperapi.models.Order;
 import com.shopper.shopperapi.models.ShoppingCar;
 import com.shopper.shopperapi.models.User;
 import com.shopper.shopperapi.services.UserService;
@@ -143,7 +142,7 @@ public class UserController {
 //    Carrito de compras
     @GetMapping("/shopping-cars/{id}")
     public ResponseEntity<?> listUserShoppingCars(@PathVariable("id") String userId) {
-        List<ShoppingCar> userSHoppingCars = this.userService.userShoppingCars(userId);
+        List<ShoppingCar> userSHoppingCars = this.userService.getUserShoppingCars(userId);
         return new ResponseEntity<>(userSHoppingCars, HttpStatus.OK);
     }
 
@@ -165,16 +164,22 @@ public class UserController {
         return new ResponseEntity<>(shoppingCarsPage, HttpStatus.OK);
     }
 
-    @PostMapping("/shopping-cars/{id}")
-    public ResponseEntity<?> updateUserShoppingCar(@RequestBody ShoppingCar shoppingCar, @PathVariable("id") String userId) {
-        List<ShoppingCar> newShoppingCar = this.userService.addProducts(userId, shoppingCar);
+    @GetMapping("/shopping-cars/{customerId}/{carId}")
+    public ResponseEntity<?> findByCar(@PathVariable("customerId") String customerId, @PathVariable("carId") String carId){
+        ShoppingCar shoppingCar = userService.findShoppingCarByUser(customerId, carId);
+        return new ResponseEntity<>(shoppingCar,HttpStatus.OK);
+    }
+
+    @PostMapping("/shopping-cars/{userId}")
+    public ResponseEntity<?> updateUserShoppingCar(@RequestBody ShoppingCar shoppingCar, @PathVariable("userId") String userId) {
+        List<ShoppingCar> newShoppingCar = this.userService.addProductsToCar(userId, shoppingCar);
         return new ResponseEntity<>(newShoppingCar, HttpStatus.CREATED);
     }
 
-    @PostMapping("/shopping-cars/{id}/{idCar}")
-    public ResponseEntity<?> favoritesDelete(@RequestBody ShoppingCar shoppingCars,
-                                       @PathVariable("id") String idCustomer, @PathVariable("idCar") String idCar) {
-        ShoppingCar newShoppingCar = this.userService.deleteFavoriteProduct(idCustomer, shoppingCars,idCar);
+    @PostMapping("/shopping-cars/{customerId}/{idCar}")
+    public ResponseEntity<?> deleteProductInCar(@RequestBody ShoppingCar shoppingCars,
+                                       @PathVariable("customerId") String customerId, @PathVariable("idCar") String idCar) {
+        ShoppingCar newShoppingCar = this.userService.deleteFavoriteProduct(customerId, shoppingCars,idCar);
         return new ResponseEntity<>(newShoppingCar, HttpStatus.OK);
     }
 }

@@ -54,6 +54,22 @@ public class OrderService {
 		return this.orderRepository.findAll();
 	}
 
+	public Order findOrder(String orderId) {
+		Order order = this.orderRepository.findById(orderId).get();
+		order.setCustomer(null);
+		if (order.getShopper() != null) {
+			order.getShopper().setPassword(null);
+			order.getShopper().setRole(null);
+			order.getShopper().setAddress(null);
+			order.getShopper().setShoppingCars(null);
+			order.getShopper().setPhoneNumber(null);
+			order.getShopper().setUserLat(0);
+			order.getShopper().setUserLng(0);
+			order.getShopper().setNotificationDeviceGroup(null);
+		}
+		return order;
+	}
+
 	// Completed/cancelled orders by customer id
 	public List<Order> findOrdersByCustomerId(String customerId) {
 		List<Order> orders = this.orderRepository.findAll();

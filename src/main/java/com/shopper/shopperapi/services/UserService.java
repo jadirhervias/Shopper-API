@@ -1,6 +1,5 @@
 package com.shopper.shopperapi.services;
 
-import com.shopper.shopperapi.models.Order;
 import com.shopper.shopperapi.models.Product;
 import com.shopper.shopperapi.models.ShoppingCar;
 import com.shopper.shopperapi.models.User;
@@ -159,7 +158,7 @@ public class UserService {
     }
 
     // Carrito de compras del usuario
-    public List<ShoppingCar> userShoppingCars(String idUser){
+    public List<ShoppingCar> getUserShoppingCars(String idUser){
         Optional<User> user = userRepository.findById(idUser);
         return user.get().getShoppingCars();
     }
@@ -172,7 +171,7 @@ public class UserService {
      */
     public Page<ShoppingCar> findShoppingCarPageByCustomerId(String customerId, Pageable pageable) {
 
-        List<ShoppingCar> userShoppingCars = this.userShoppingCars(customerId);
+        List<ShoppingCar> userShoppingCars = this.getUserShoppingCars(customerId);
 
         int start = (int) pageable.getOffset();
 
@@ -192,7 +191,7 @@ public class UserService {
         return products.stream().mapToInt(Product::getQuantity).sum();
     }
 
-    public List<ShoppingCar> addProducts(String idUser, ShoppingCar shoppingCar) {
+    public List<ShoppingCar> addProductsToCar(String idUser, ShoppingCar shoppingCar) {
         Optional<User> user = userRepository.findById(idUser);
         List<ShoppingCar> userShoppingCars = new ArrayList<>();
         if (user.get().getShoppingCars() != null) {
@@ -254,7 +253,7 @@ public class UserService {
         return user.get().getShoppingCars();
     }
 
-    public ShoppingCar findCarUser(String idUser,String idCar) {
+    public ShoppingCar findShoppingCarByUser(String idUser,String idCar) {
         List<ShoppingCar> userShoppingCars = userRepository.findById(idUser).get().getShoppingCars();
         if (userShoppingCars != null && userShoppingCars.size() > 1) {
             Optional<ShoppingCar> shoppingCar = userShoppingCars
@@ -268,7 +267,7 @@ public class UserService {
 
     public ShoppingCar deleteFavoriteProduct(String idUser,ShoppingCar shoppingCar,String idCar){
         Optional<User> user = userRepository.findById(idUser);
-        ShoppingCar userCar = this.findCarUser(idUser, idCar);
+        ShoppingCar userCar = this.findShoppingCarByUser(idUser, idCar);
         List<Product> productsDelete = shoppingCar.getProducts();
         Predicate<Product> isInTheCar = item -> productsDelete.stream()
                 .map(Product::getId)
