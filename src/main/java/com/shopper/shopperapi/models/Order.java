@@ -91,6 +91,10 @@ public class Order {
 	@JsonAlias({"source_id", "sourceId"})
 	private String sourceId;
 
+	@Field("operation_id")
+	@JsonProperty("operation_id")
+	private String operationId;
+
 	public Order(){
 	}
 
@@ -104,7 +108,7 @@ public class Order {
 	@Override
 	public String toString() {
 		return "Order{" +
-				"id=" + id +
+				"id='" + id + '\'' +
 				", customer=" + customer +
 				", shopper=" + shopper +
 				", shopId='" + shopId + '\'' +
@@ -112,11 +116,13 @@ public class Order {
 				", coordenates=" + coordenates +
 				", shoppingCar=" + shoppingCar +
 				", state=" + state +
-				", fechaCompra=" + fechaCompra +
-				", fechaEntrega=" + fechaEntrega +
+				", fechaCompra='" + fechaCompra + '\'' +
+				", fechaEntrega='" + fechaEntrega + '\'' +
 				", description='" + description + '\'' +
+				", charge=" + charge +
 				", totalCost=" + totalCost +
 				", sourceId='" + sourceId + '\'' +
+				", operationId='" + operationId + '\'' +
 				'}';
 	}
 
@@ -138,6 +144,7 @@ public class Order {
 				Objects.equals(fechaEntrega, order.fechaEntrega) &&
 				Objects.equals(description, order.description) &&
 				Objects.equals(charge, order.charge) &&
-				Objects.equals(sourceId, order.sourceId);
+				Objects.equals(sourceId, order.sourceId) &&
+				Objects.equals(operationId, order.operationId);
 	}
 }

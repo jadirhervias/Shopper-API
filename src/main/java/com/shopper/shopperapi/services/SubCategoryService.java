@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -66,6 +68,16 @@ public class SubCategoryService {
         Page<Product> prodcutsPage = new PageImpl<>(products.subList(start, end), pageable, products.size());
 
         return prodcutsPage;
+    }
+
+    public List<Product> searchProductos(String idSubcategory, String producto) {
+
+        Pattern searchPattern = Pattern.compile("(.*)" + producto + "(.*)", Pattern.CASE_INSENSITIVE);
+
+        SubCategory subCategory = this.subCategoryRepository.findById(idSubcategory).get();
+        return subCategory.getProducts().stream()
+                .filter((item) -> searchPattern.matcher(item.getName()).find())
+                .collect(Collectors.toList());
     }
 
     /**

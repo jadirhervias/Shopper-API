@@ -1,5 +1,7 @@
 package com.shopper.shopperapi.services;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -8,9 +10,6 @@ import com.shopper.shopperapi.models.*;
 import net.minidev.json.JSONObject;
 import com.shopper.shopperapi.utils.distance.DistanceCalculated;
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.boot.configurationprocessor.json.JSONException;
 
 import com.shopper.shopperapi.repositories.OrderRepository;
 
@@ -18,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,6 +44,7 @@ public class OrderService {
 	@Autowired
 	private RestTemplate restTemplate;
 	private final String DJANGO_API = "http://54.200.195.251/api/pagos/";
+	private final String INFO_OPERATION = "https://api.culqi.com/v2/charges/";
 
 	/**
 	 * TODO: Funcionalidad para ubicar al shopper(S) más cercano al customer
@@ -71,20 +72,41 @@ public class OrderService {
 	}
 
 	// Completed/cancelled orders by customer id
-	public List<Order> findOrdersByCustomerId(String customerId) {
+	public List<Order> findOrdersByCustomerId(String customerId) throws ParseException {
 		List<Order> orders = this.orderRepository.findAll();
+
+		// To sort by date
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		Calendar calendar = Calendar.getInstance();
+		calendar.set(Calendar.DAY_OF_MONTH,1);
+		String firstDayMonth = sdf.format(calendar.getTime());
+		calendar.set(Calendar.MONTH,calendar.get(Calendar.MONTH)+1);
+		String nextFirstDayMonth = sdf.format(calendar.getTime());
+		//Tranformandolo a date
+		Date nextFirstDayMonthDate = sdf.parse(nextFirstDayMonth);
+		Date firstDayMonthDate = sdf.parse(firstDayMonth);
+		// To sort by date
+
 		return orders.stream()
 				.map((order) -> {
-					if (order.getCustomer().getId().equals(customerId)) {
-						order.getCustomer().setShoppingCars(null);
-						order.getCustomer().setNotificationDeviceGroup(null);
-						order.getCustomer().setPassword(null);
-						if (order.getShopper() != null) {
-							order.getShopper().setShoppingCars(null);
-							order.getShopper().setNotificationDeviceGroup(null);
-							order.getShopper().setPassword(null);
+					try {
+						Date orderDate = sdf.parse(order.getFechaCompra());
+						if (orderDate.after(firstDayMonthDate) && orderDate.before(nextFirstDayMonthDate)) {
+							if (order.getCustomer().getId().equals(customerId)) {
+								order.getCustomer().setShoppingCars(null);
+								order.getCustomer().setNotificationDeviceGroup(null);
+								order.getCustomer().setPassword(null);
+								if (order.getShopper() != null) {
+									order.getShopper().setShoppingCars(null);
+									order.getShopper().setNotificationDeviceGroup(null);
+									order.getShopper().setPassword(null);
+								}
+								return order;
+							}
+							return null;
 						}
-						return order;
+					} catch (ParseException e) {
+						e.printStackTrace();
 					}
 					return null;
 				})
@@ -98,7 +120,7 @@ public class OrderService {
 	 * @param pageable-
 	 * @return Page<Order>
 	 */
-	public Page<Order> findOrderPageByCustomerId(String customerId, Pageable pageable) {
+	public Page<Order> findOrderPageByCustomerId(String customerId, Pageable pageable) throws ParseException {
 
 		List<Order> userOrders = this.findOrdersByCustomerId(customerId);
 
@@ -133,7 +155,7 @@ public class OrderService {
 	}
 
 	// Process order charge
-	public boolean processOrder(Order order) throws JSONException {
+	public boolean processOrder(Order order) {
 		User customer = order.getCustomer();
 
 		System.out.println(order.getSourceId());
@@ -142,11 +164,11 @@ public class OrderService {
 		System.out.println(order.getTotalCost());
 
 		if (order.getTotalCost() >= 300) {
-			boolean cardVerified = cardOperation(order.getSourceId(), customer.getId(), customer.getEmail(), order.getTotalCost());
+			NewChargeResponse cardVerified = cardOperation(order.getSourceId(), customer.getId(), customer.getEmail(), order.getTotalCost());
 
-			if (cardVerified) {
+			if (cardVerified.getStatus() != null) {
 				// Call to firebase database - publicar la orden y notificar a shoppera más cercanos
-				newOrder(order);
+				newOrder(order, cardVerified.getId());
 				return true;
 			} else {
 				System.out.println("card problem");
@@ -169,7 +191,7 @@ public class OrderService {
 	}
 
 	// Expose order in Firebase cloud
-	public void newOrder(Order order) {
+	public void newOrder(Order order, String idOperation) {
 
 		DatabaseReference ordersRef = databaseReference.child("orders");
 
@@ -181,6 +203,7 @@ public class OrderService {
 		order.setFirebaseDbReferenceKey(orderFirebaseDbRefKey);
 		order.setId(ObjectId.get().toHexString());
 		order.setState(PENDING_ORDER_STATE.getState());
+		order.setOperationId(idOperation);
 
 		// Hide sensitive data
 		if (order.getShopper() != null) {
@@ -258,9 +281,9 @@ public class OrderService {
 		});
 	}
 
-	public boolean cardOperation(String sourceId, String customerId, String customerEmail, int totalCost) {
+	public NewChargeResponse cardOperation(String sourceId, String customerId, String customerEmail, int totalCost) {
 
-		boolean success;
+		NewChargeResponse response = new NewChargeResponse();
 
 		JSONObject param = new JSONObject();
 		param.put("amount", totalCost);
@@ -274,12 +297,22 @@ public class OrderService {
 		ResponseEntity<NewChargeResponse> charge = restTemplate.exchange(DJANGO_API, HttpMethod.POST, httpEntity, NewChargeResponse.class);
 
 		if (charge.getBody() != null && charge.getBody().getStatus().equals("201")) {
-			success = true;
+			response.setId(charge.getBody().getId());
+			response.setStatus(charge.getBody().getStatus());
 		} else {
-			success = false;
+			response.setId(null);
+			response.setStatus(null);
 		}
 
-		return success;
+		return response;
+	}
+
+	public InfoOperationCard operation(String id_operation) {
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("Authorization", "Bearer sk_test_ifqClViyXgOFU5R6");
+		HttpEntity<String> httpEntity = new HttpEntity<String>(headers);
+		ResponseEntity<CardResponse> info = restTemplate.exchange(INFO_OPERATION, HttpMethod.GET, httpEntity, CardResponse.class);
+		return Objects.requireNonNull(info.getBody()).getInformation().get(0);
 	}
 
 	/**

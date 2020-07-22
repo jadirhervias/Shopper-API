@@ -74,6 +74,12 @@ public class SubCategoryController {
         return ResponseEntity.ok(subCategory);
     }
 
+    @GetMapping("/search/products/{idSubcategory}/{name}")
+    public ResponseEntity<?> findProductName(@PathVariable("idSubcategory") String idSubcategory, @PathVariable("name") String producto){
+        List<Product> products = this.subCategoryService.searchProductos(idSubcategory, producto.replace("_", " "));
+        return new ResponseEntity<>(products,HttpStatus.OK);
+    }
+
     @PostMapping
     @ApiOperation(value = "Crear sub-categoría", notes = "Servicio para crear sub categoría")
     @ApiResponses(value = {
