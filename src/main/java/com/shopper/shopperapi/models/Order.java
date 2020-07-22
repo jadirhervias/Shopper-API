@@ -90,6 +90,10 @@ public class Order {
 	@JsonProperty("source_id")
 	@JsonAlias({"source_id", "sourceId"})
 	private String sourceId;
+	
+	@Field("operation_id")
+	@JsonProperty("operation_id")
+	private String operationId;
 
 	public Order(){
 	}
@@ -99,25 +103,6 @@ public class Order {
 	@Exclude
 	public Charge getCharge() {
 		return charge;
-	}
-
-	@Override
-	public String toString() {
-		return "Order{" +
-				"id=" + id +
-				", customer=" + customer +
-				", shopper=" + shopper +
-				", shopId='" + shopId + '\'' +
-				", firebaseDbReferenceKey='" + firebaseDbReferenceKey + '\'' +
-				", coordenates=" + coordenates +
-				", shoppingCar=" + shoppingCar +
-				", state=" + state +
-				", fechaCompra=" + fechaCompra +
-				", fechaEntrega=" + fechaEntrega +
-				", description='" + description + '\'' +
-				", totalCost=" + totalCost +
-				", sourceId='" + sourceId + '\'' +
-				'}';
 	}
 
 	@Override
@@ -138,6 +123,16 @@ public class Order {
 				Objects.equals(fechaEntrega, order.fechaEntrega) &&
 				Objects.equals(description, order.description) &&
 				Objects.equals(charge, order.charge) &&
-				Objects.equals(sourceId, order.sourceId);
+				Objects.equals(sourceId, order.sourceId) && 
+				Objects.equals(operationId, order.operationId);
+	}
+
+	@Override
+	public String toString() {
+		return "Order [id=" + id + ", customer=" + customer + ", shopper=" + shopper + ", shopId=" + shopId
+				+ ", firebaseDbReferenceKey=" + firebaseDbReferenceKey + ", coordenates=" + coordenates
+				+ ", shoppingCar=" + shoppingCar + ", state=" + state + ", fechaCompra=" + fechaCompra
+				+ ", fechaEntrega=" + fechaEntrega + ", description=" + description + ", charge=" + charge
+				+ ", totalCost=" + totalCost + ", sourceId=" + sourceId + ", operationId=" + operationId + "]";
 	}
 }

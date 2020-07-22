@@ -10,8 +10,6 @@ import com.shopper.shopperapi.models.*;
 import net.minidev.json.JSONObject;
 import com.shopper.shopperapi.utils.distance.DistanceCalculated;
 import org.bson.types.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 
 import com.shopper.shopperapi.repositories.OrderRepository;
@@ -27,6 +25,7 @@ import static com.shopper.shopperapi.utils.notification.OrderState.PENDING_ORDER
 import static com.shopper.shopperapi.utils.notification.OrderState.isOrderTakenState;
 
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
@@ -46,6 +45,7 @@ public class OrderService {
 	@Autowired
 	private RestTemplate restTemplate;
 	private final String DJANGO_API = "http://54.200.195.251/api/pagos/";
+	private final String INFO_OPERATION = "https://api.culqi.com/v2/charges/";
 
 	/**
 	 * TODO: Funcionalidad para ubicar al shopper(S) más cercano al customer
@@ -155,11 +155,11 @@ public class OrderService {
 		System.out.println(order.getTotalCost());
 
 		if (order.getTotalCost() >= 300) {
-			boolean cardVerified = cardOperation(order.getSourceId(), customer.getId(), customer.getEmail(), order.getTotalCost());
+			NewChargeResponse cardVerified = cardOperation(order.getSourceId(), customer.getId(), customer.getEmail(), order.getTotalCost());
 
-			if (cardVerified) {
+			if (cardVerified.getStatus() != null) {
 				// Call to firebase database - publicar la orden y notificar a shoppera más cercanos
-				newOrder(order);
+				newOrder(order,cardVerified.getId());
 				return true;
 			} else {
 				System.out.println("card problem");
@@ -182,7 +182,7 @@ public class OrderService {
 	}
 
 	// Expose order in Firebase cloud
-	public void newOrder(Order order) {
+	public void newOrder(Order order,String id_operation) {
 
 		DatabaseReference ordersRef = databaseReference.child("orders");
 
@@ -194,6 +194,7 @@ public class OrderService {
 		order.setFirebaseDbReferenceKey(orderFirebaseDbRefKey);
 		order.setId(ObjectId.get().toHexString());
 		order.setState(PENDING_ORDER_STATE.getState());
+		order.setOperationId(id_operation);
 
 		// Hide sensitive data
 		if (order.getShopper() != null) {
@@ -271,10 +272,10 @@ public class OrderService {
 		});
 	}
 
-	public boolean cardOperation(String sourceId, String customerId, String customerEmail, int totalCost) {
-
-		boolean success;
-
+	public NewChargeResponse cardOperation(String sourceId, String customerId, String customerEmail, int totalCost) {
+		
+		NewChargeResponse response = new NewChargeResponse();
+		
 		JSONObject param = new JSONObject();
 		param.put("amount", totalCost);
 		param.put("currency_code", "PEN");
@@ -285,14 +286,17 @@ public class OrderService {
 		HttpEntity<String> httpEntity = new HttpEntity<>(param.toString());
 
 		ResponseEntity<NewChargeResponse> charge = restTemplate.exchange(DJANGO_API, HttpMethod.POST, httpEntity, NewChargeResponse.class);
-
+		
+		
+		
 		if (charge.getBody() != null && charge.getBody().getStatus().equals("201")) {
-			success = true;
+			response.setId(charge.getBody().getId());
+			response.setStatus(charge.getBody().getStatus());
 		} else {
-			success = false;
+			response.setId(null);
+			response.setStatus(null);
 		}
-
-		return success;
+		return response;
 	}
 
 	/**
@@ -319,7 +323,15 @@ public class OrderService {
 		for (OrderShopper orderShopper2 : orderShopper) {
 			notification_key.add(orderShopper2.getNotification_key());
 		}
-
 		return notification_key;
+	}
+	
+	public InfoOperationCard operation(String id_operation) {
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("Authorization", "Bearer sk_test_ifqClViyXgOFU5R6");
+		HttpEntity<String> httpEntity = new HttpEntity<String>(headers);
+		ResponseEntity<RespuestaCard> info = restTemplate.exchange(INFO_OPERATION, HttpMethod.GET, httpEntity, RespuestaCard.class);
+		InfoOperationCard infoOperation = info.getBody().getInformation().get(0);
+		return infoOperation;
 	}
 }

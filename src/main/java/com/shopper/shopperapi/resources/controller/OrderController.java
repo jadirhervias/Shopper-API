@@ -1,8 +1,14 @@
 package com.shopper.shopperapi.resources.controller;
 
+import com.shopper.shopperapi.models.Charge;
+import com.shopper.shopperapi.models.InfoOperationCard;
+import com.shopper.shopperapi.models.NewChargeResponse;
 import com.shopper.shopperapi.models.Order;
+import com.shopper.shopperapi.models.User;
 import com.shopper.shopperapi.services.OrderService;
+import com.shopper.shopperapi.services.UserService;
 
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -136,5 +142,11 @@ public class OrderController {
             @PathVariable("orderFirebaseDbRefKey") String orderFirebaseDbRefKey) {
         orderService.handleOrder(orderFirebaseDbRefKey, ORDER_CANCELLED_STATE.getState(), shopperId);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+    
+    @GetMapping("/operation/{id}")
+    public ResponseEntity<?> infoOperatio(@PathVariable("id")String id_operation){
+    	InfoOperationCard infoOperationCard = this.orderService.operation(id_operation);
+    	return new ResponseEntity<>(infoOperationCard,HttpStatus.OK);
     }
 }
