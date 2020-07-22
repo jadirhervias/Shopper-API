@@ -148,4 +148,10 @@ public class ProductController {
             this.productService.delete(productToDelete);
         }
     }
+    
+    @GetMapping("/find/product/{name}")
+    public ResponseEntity<?> findProductName(@PathVariable("name")String producto){
+    	List<Product> products = this.productService.prodcutos(producto.replace("_", " "));
+    	return new ResponseEntity<>(products,HttpStatus.OK);
+    }
 }

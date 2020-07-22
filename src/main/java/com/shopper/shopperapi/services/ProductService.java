@@ -92,4 +92,8 @@ public class ProductService {
     public void delete(Product product) {
         this.productRepository.delete(product);
     }
+    
+    public List<Product> prodcutos(String producto) {
+		return this.productRepository.findByNameRegex(producto);
+	}
 }
