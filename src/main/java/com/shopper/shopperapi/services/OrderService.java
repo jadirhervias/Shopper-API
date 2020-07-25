@@ -43,7 +43,7 @@ public class OrderService {
 	private DatabaseReference databaseReference;
 	@Autowired
 	private RestTemplate restTemplate;
-	private final String DJANGO_API = "http://54.200.195.251/api/pagos/";
+	private final String DJANGO_API = "http://54.218.120.209/api/pagos/";
 	private final String INFO_OPERATION = "https://api.culqi.com/v2/charges/";
 
 	/**
