@@ -74,8 +74,6 @@ public class OrderService {
 	// Completed/cancelled orders by customer id
 	public List<Order> findOrdersByCustomerId(String customerId) throws ParseException {
 		List<Order> orders = this.orderRepository.findAll();
-
-		// To sort by date
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		Calendar calendar = Calendar.getInstance();
 		calendar.set(Calendar.DAY_OF_MONTH,1);
@@ -85,7 +83,6 @@ public class OrderService {
 		//Tranformandolo a date
 		Date nextFirstDayMonthDate = sdf.parse(nextFirstDayMonth);
 		Date firstDayMonthDate = sdf.parse(firstDayMonth);
-		// To sort by date
 
 		return orders.stream()
 				.map((order) -> {
@@ -108,6 +105,7 @@ public class OrderService {
 					} catch (ParseException e) {
 						e.printStackTrace();
 					}
+
 					return null;
 				})
 				.filter(Objects::nonNull)
@@ -122,15 +120,22 @@ public class OrderService {
 	 */
 	public Page<Order> findOrderPageByCustomerId(String customerId, Pageable pageable) throws ParseException {
 
-		List<Order> userOrders = this.findOrdersByCustomerId(customerId);
+		List<Order> userOrders;
+		try {
+			userOrders = this.findOrdersByCustomerId(customerId);
+			
+			int start = (int) pageable.getOffset();
 
-		int start = (int) pageable.getOffset();
+			int end = Math.min((start + pageable.getPageSize()), userOrders.size());
 
-		int end = Math.min((start + pageable.getPageSize()), userOrders.size());
+			Page<Order> ordersPage = new PageImpl<>(userOrders.subList(start, end), pageable, userOrders.size());
 
-		Page<Order> ordersPage = new PageImpl<>(userOrders.subList(start, end), pageable, userOrders.size());
-
-		return ordersPage;
+			return ordersPage;
+			
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	// Pending orders by customer id
