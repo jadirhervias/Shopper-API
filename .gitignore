@@ -312,3 +312,7 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.gitignore.io/api/git,java,linux,macos,maven,windows,eclipse,java-web,intellij
+
+application.properties
+application-prod.properties
+application-dev.properties
